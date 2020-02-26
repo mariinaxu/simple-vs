@@ -7,21 +7,28 @@ import nidaqmx as ni
 import numpy as np
 from time import sleep, time
 
+data = []
 
+def callback(task_handle, every_n_samples_event_type,
+                number_of_samples, callback_data):
+    print('Every N Samples callback invoked.')
 
+    samples = task.read(number_of_samples_per_channel=200)
+    data.append(samples)
+
+    return 0
 
 task = ni.Task()
 task.ai_channels.add_ai_voltage_chan("Dev1/ai1:7")
 task.timing.cfg_samp_clk_timing(1000)
+task.register_every_n_samples_acquired_into_buffer_event(200, callback)
+
 task.start()
 
 sleep(5)
 
-data = task.read()
-
-
-print(data)
-print(type(data))
+data = np.asarray(data)
+print(data.shape)
 
 task.close()
 # task = ni.Task()
