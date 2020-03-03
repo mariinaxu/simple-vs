@@ -18,3 +18,6 @@ if __name__ == "__main__":
     #data_log.trigger_cameras()
     #data_log.wait_for_2p_response()
     exp = SimpleOrientationExperiment("monitor_config.yaml", "base_config.yaml")
+
+    exp.load_experiment_config()
+    exp.run_experiment()

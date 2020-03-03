@@ -1,22 +1,18 @@
 #Experiment config file
 # Basic file for parameters of the experiment
 # All delays in seconds
-n_trials: 2
-iti_length: 2
-stim_one_length: 1
-delay_one_length: 2.0
-stim_two_length: 1
-delay_two_length: 2.0
-response_length: 15
-
+n_trials: 4
+pre_trial_delay: 1.5
+stim_length: 2.5
+post_trial_delay: 1.5
 
 #Parameters of visual stimuli
 
-# Two possible gratings but equal possible parameters.
+# 4 orientation gratings
 grating_sf: 0.08
 grating_position: [0, 0]
-grating_orientations: [0, 180]
-grating_phases: [0, 1]
+grating_orientations: [0, 45, 90]
+grating_phases_range: [0, 1]
 grating_size: [60, 60]
 grating_mask: 'gauss'
 

@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
-import psychopy
-import pyaml
+import psychopy.visual
+import psychopy.event
+import psychopy.monitors
+import yaml
 
 class BaseExperiment(ABC):
     def __init__(self, monitor_config_filename, exp_config_filename,):
@@ -8,8 +10,8 @@ class BaseExperiment(ABC):
         self.monitor_settings = None
         self.window = None
 
-        self.exp_config = None
-        self.exp_config_filename = exp_config_filename
+        self.exp_parameters = None
+        self.exp_parameters_filename = exp_config_filename
         
         self.clock = psychopy.core.Clock()
 
