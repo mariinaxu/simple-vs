@@ -13,9 +13,9 @@ class SimpleOrientationExperiment(BaseExperiment):
 
         # Load n trials and timing lengths
         self.n_trials = self.exp_parameters['n_trials']
-        self.pre_trial_delay = self.exp_parameters['pre_trial_delay']
+        self.pre_experiment_delay = self.exp_parameters['pre_experiment_delay']
         self.stim_length = self.exp_parameters['stim_length']
-        self.post_trial_delay = self.exp_parameters['post_trial_delay']
+        self.inter_trial_delay = self.exp_parameters['inter_trial_delay']
 
         # Load the stim parameters
         self.grating_sf = self.exp_parameters['grating_sf']
@@ -26,12 +26,23 @@ class SimpleOrientationExperiment(BaseExperiment):
         self.grating_mask = self.exp_parameters['grating_mask']
 
         # ps stands for psychopy... 
-        self.ps_grating = psychopy.visual.GratingStim(win=self.window, units="deg", sf=self.grating_sf,
+        self.ps_grating = psychopy.visual.GratingStim(win=self.window, units="deg", pos=self.grating_position, sf=self.grating_sf,
                                                        size=self.grating_size, mask=self.grating_mask)
 
 
 
     def run_experiment(self, ):
+
+        # pre experiment delay
+        self.clock.reset()
+        self.master_clock.reset()
+        while self.clock.getTime() < self.pre_experiment_delay:
+            #log start of exp (master_clock)
+            self.photodiode_square.draw()
+            self.window.flip()
+
+        self.absolute_total_time += self.pre_experiment_delay
+
         for trial in range(self.n_trials):
             current_orientation = np.random.choice(self.grating_orientations)
             #current_phase = np.random.randint(self.grating_phases_range[0], self.grating_phases_range[1])
@@ -42,23 +53,24 @@ class SimpleOrientationExperiment(BaseExperiment):
             total_time = 0
             self.clock.reset()
 
-            #pre trial delay
-            while self.clock.getTime() < self.pre_trial_delay:
-                self.window.flip()
+            self.photodiode_square.color = self.square_color_on
+            while self.clock.getTime() < self.stim_length:
+                self.ps_grating.phase = np.mod(self.clock.getTime() / 0.9, 1)
 
-            total_time += self.pre_trial_delay
-
-            while self.clock.getTime() < total_time + self.stim_length:
-                self.ps_grating.phase = np.mod(self.clock.getTime() / 0.8, 1)
+                # log stim ON
 
                 self.ps_grating.draw()
+                self.photodiode_square.draw()
+
                 self.window.flip()
+            self.photodiode_square.color = self.square_color_off
 
             total_time += self.stim_length
 
 
-            while self.clock.getTime() < self.post_trial_delay:
+            while self.clock.getTime() < total_time+self.inter_trial_delay:
+                self.photodiode_square.draw()
                 self.window.flip()
 
-            total_time += self.post_trial_delay
+            total_time += self.inter_trial_delay
 

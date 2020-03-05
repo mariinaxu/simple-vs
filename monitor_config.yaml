@@ -10,7 +10,12 @@ monitor_gamma: 1
 
 
 # TODO need to add square settings
-square_size: [100, 100]
-square_location: [0, 0]
-square_color_off: [0]
-square_color_on: [255]
+# UNITS in pixels
+# [width, size]
+square_size: [500, 500]
+square_position: [-960 , -540] # find a nicer way to specify, but this is basically -(resolution/2) for left corner
+
+
+# color units are 0->1 (1 is max white)
+square_color_off: [-1]
+square_color_on: [1]
