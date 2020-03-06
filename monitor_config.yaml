@@ -11,8 +11,8 @@ monitor_gamma: 1
 
 # TODO need to add square settings
 # UNITS in pixels
-# [width, size]
-square_size: [500, 500]
+# [width, size
+square_size: [300, 300]
 square_position: [-960 , -540] # find a nicer way to specify, but this is basically -(resolution/2) for left corner
 
 

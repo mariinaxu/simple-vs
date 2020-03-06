@@ -78,7 +78,8 @@ class BaseExperiment(ABC):
                                             units='deg',
                                             screen=self.monitor_settings['screen_id'],
                                             allowGUI=False,
-                                            fullscr=True)
+                                            fullscr=True,
+                                            waitBlanking=True)
 
 
     def create_photodiode_square(self):

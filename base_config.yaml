@@ -2,7 +2,7 @@
 # Basic file for parameters of the experiment
 # All delays in seconds
 
-n_trials: 2
+n_trials: 5
 
 # the delay before starting and after ending the experiment (black square comes on at half of this time)
 experiment_delay: 5
@@ -16,6 +16,6 @@ grating_sf: 0.08
 grating_position: [0, 0]
 grating_orientations: [0, 45, 90]
 grating_phases_range: [0, 1]
-grating_size: [60, 60]
-grating_mask: 'gauss'
+grating_size: [180, 180]
+grating_mask: 'circle'
 
