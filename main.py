@@ -5,21 +5,34 @@
 from sys import platform
 import numpy as np
 from time import sleep, time
+from datetime import datetime
 
+from DAQ import DAQ
 from SimpleOrientationExperiment import SimpleOrientationExperiment
 
-save_config_file = ""
+bool_DEBUG = True
+
+def create_experiment_name():
+    if not bool_DEBUG:
+        experiment_id = input("Enter Experiment name: (MXXXX_XXXXX_XX): ")
+    else:
+        # when debugging we make a fake tag 
+        now = datetime.now()
+        date = str(now).split(" ")[0].replace("-", "")[2:]
+        experiment_id = "M{}_12345_FB".format(date)
+
+    return experiment_id
 
 
 if __name__ == "__main__":
-    exp = SimpleOrientationExperiment("monitor_config.yaml", "save_settings_config.yaml", "base_config.yaml")
-    #data_log = NIDAQ_2p(save_config_file)
+    experiment_id = create_experiment_name()
+    data_aq = DAQ()
+
+    exp = SimpleOrientationExperiment(experiment_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "base_config.yaml", debug=bool_DEBUG)
 
     exp.load_experiment_config()
-
-    #data_log.start_logging()
-    #data_log.trigger_2p()
-    #data_log.trigger_cameras()
-    #data_log.wait_for_2p_response()
+    exp.start_data_acquisition()
 
     exp.run_experiment()
+
+    exp.stop_data_acquisition()

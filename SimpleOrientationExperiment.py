@@ -13,7 +13,7 @@ class SimpleOrientationExperiment(BaseExperiment):
 
         # Load n trials and timing lengths
         self.n_trials = self.exp_parameters['n_trials']
-        self.pre_experiment_delay = self.exp_parameters['pre_experiment_delay']
+        self.experiment_delay = self.exp_parameters['experiment_delay']
         self.stim_length = self.exp_parameters['stim_length']
         self.inter_trial_delay = self.exp_parameters['inter_trial_delay']
 
@@ -36,12 +36,15 @@ class SimpleOrientationExperiment(BaseExperiment):
         # pre experiment delay
         self.clock.reset()
         self.master_clock.reset()
-        while self.clock.getTime() < self.pre_experiment_delay:
-            #log start of exp (master_clock)
-            self.photodiode_square.draw()
+        # Half of the experiment delay there is no black square and then we draw it, that's when the experiment starts.
+        print(self.master_clock.getTime())
+        while self.clock.getTime() < self.experiment_delay:
+            if self.clock.getTime() >= self.experiment_delay/2:
+                self.photodiode_square.draw()
+                #TODO log start of exp (master_clock)
             self.window.flip()
 
-        self.absolute_total_time += self.pre_experiment_delay
+        self.absolute_total_time += self.experiment_delay
 
         for trial in range(self.n_trials):
             current_orientation = np.random.choice(self.grating_orientations)
@@ -53,6 +56,7 @@ class SimpleOrientationExperiment(BaseExperiment):
             total_time = 0
             self.clock.reset()
 
+            print("STIM: {}".format(trial), self.master_clock.getTime())
             self.photodiode_square.color = self.square_color_on
             while self.clock.getTime() < self.stim_length:
                 self.ps_grating.phase = np.mod(self.clock.getTime() / 0.9, 1)
@@ -73,4 +77,13 @@ class SimpleOrientationExperiment(BaseExperiment):
                 self.window.flip()
 
             total_time += self.inter_trial_delay
+
+        # Half of the experiment delay there IS black square and then we stop drawing it, that's when the experiment ends.
+        self.clock.reset()
+        while self.clock.getTime() < self.experiment_delay:
+            if self.clock.getTime() < self.experiment_delay/2:
+                self.photodiode_square.draw()
+                #TODO log end of exp (master_clock)
+            self.window.flip()
+        print(self.master_clock.getTime())
 

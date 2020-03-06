@@ -1,8 +1,11 @@
 #Experiment config file
 # Basic file for parameters of the experiment
 # All delays in seconds
-n_trials: 4
-pre_experiment_delay: 5
+
+n_trials: 2
+
+# the delay before starting and after ending the experiment (black square comes on at half of this time)
+experiment_delay: 5
 stim_length: 2.5
 inter_trial_delay: 2.5
 

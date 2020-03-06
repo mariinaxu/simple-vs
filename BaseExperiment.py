@@ -1,17 +1,26 @@
 from abc import ABC, abstractmethod
+
+from DAQ import DAQ
+from ExperimentLogger import ExperimentLogger
+
 import psychopy.visual
 import psychopy.event
 import psychopy.monitors
 import yaml
+from sys import platform
+import os
 
 class BaseExperiment(ABC):
-    def __init__(self, monitor_config_filename, save_settings_config_filename, exp_config_filename,):
+    def __init__(self, experiment_id, daq, monitor_config_filename, save_settings_config_filename, exp_config_filename, debug):
+        self.experiment_id = experiment_id
+        self.debug = debug
+
+        # the NI daq logging class 
+        self.daq = daq
+
         self.monitor = None
         self.monitor_settings = None
         self.window = None
-
-        self.save_settings = None
-        self.save_settings_config_filename = save_settings_config_filename
 
         self.exp_parameters = None
         self.exp_parameters_filename = exp_config_filename
@@ -23,7 +32,17 @@ class BaseExperiment(ABC):
         self.load_monitor(monitor_config_filename)
         self.load_window()
 
+        self.save_dir = None
+        self.experiment_log_filename = None
+        self.ni_log_filename = None
+        self.create_save_directories(save_settings_config_filename)
+
+        # experiment trial params logger
+        self.exp_log = ExperimentLogger(self.experiment_log_filename) 
+        self.daq.ni_log_filename = self.ni_log_filename
+
         self.create_photodiode_square()
+
 
 
     def __del__(self):
@@ -31,8 +50,6 @@ class BaseExperiment(ABC):
 
     
     def load_monitor(self, monitor_config_filename):
-
-        #Constructor loads the parameters for the VS experiment
         with open(monitor_config_filename, 'r') as file:
             self.monitor_settings = yaml.load(file, Loader=yaml.FullLoader)
         
@@ -63,6 +80,7 @@ class BaseExperiment(ABC):
                                             allowGUI=False,
                                             fullscr=True)
 
+
     def create_photodiode_square(self):
         # Load the settings of the square that goes on the photodiode
         self.square_size = self.monitor_settings['square_size']
@@ -72,6 +90,54 @@ class BaseExperiment(ABC):
 
         self.photodiode_square = psychopy.visual.Rect(win=self.window, pos=self.square_position, width=self.square_size[0], height=self.square_size[1], 
                                                       units='pix', color=self.square_color_off)
+
+
+    def create_save_directories(self, save_settings_config_filename):
+        with open(save_settings_config_filename, 'r') as file:
+            save_settings = yaml.load(file, Loader=yaml.FullLoader)
+
+        if platform == "win-32":
+            self.save_dir = os.path.join(save_settings['LABSERVER_DIR_WIN'], self.experiment_id)
+        else:
+            self.save_dir = os.path.join(save_settings['LABSERVER_DIR_LIN'], self.experiment_id)
+
+        self.data_log_dir = os.path.join(self.save_dir, save_settings['log_folder']) 
+        dirs_to_make = save_settings["dirs_to_make"]
+
+        # set the log filenames for the NI log and the exp log
+        self.experiment_log_filename = os.path.join(self.data_log_dir, save_settings['experiment_log'])
+        self.ni_log_filename = os.path.join(self.data_log_dir, save_settings['nidaq_log'])
+
+
+        if not os.path.exists(self.save_dir):
+            os.makedirs(self.save_dir)
+        else:
+            if not self.debug:
+                raise Exception("Experiment ID: {} already exists make new ID...".format(self.experiment_id))
+
+        for dir_to_make in dirs_to_make:
+            os.makedirs(os.path.join(self.save_dir, dir_to_make), exist_ok=self.debug)
+
+
+
+    def start_data_acquisition(self,):
+        if self.daq is None:
+            raise Exception("Please set the daq object, it has not been set.")
+
+        self.daq.start_logging()  
+        self.daq.start_2p()
+        self.daq.start_cameras()
+
+        if not self.daq.wait_for_2p_aq():
+            raise Exception("2-photon microscope did not start acqsuisition...")
+
+
+    def stop_data_acquisition(self,):
+        self.daq.stop_cameras()
+        self.daq.stop_2p()
+        self.daq.stop_logging()
+
+
 
 
     @abstractmethod
