@@ -32,16 +32,19 @@ class SimpleOrientationExperiment(BaseExperiment):
 
 
     def run_experiment(self, ):
-
+        bool_logged_start = False
+        bool_logged_end = False
         # pre experiment delay
         self.clock.reset()
         self.master_clock.reset()
         # Half of the experiment delay there is no black square and then we draw it, that's when the experiment starts.
-        print(self.master_clock.getTime())
         while self.clock.getTime() < self.experiment_delay:
             if self.clock.getTime() >= self.experiment_delay/2:
+                if not bool_logged_start:
+                    self.exp_log.log_exp_start(self.master_clock.getTime())
+                    bool_logged_start = True
                 self.photodiode_square.draw()
-                #TODO log start of exp (master_clock)
+
             self.window.flip()
 
         self.absolute_total_time += self.experiment_delay
@@ -51,13 +54,13 @@ class SimpleOrientationExperiment(BaseExperiment):
             #current_phase = np.random.randint(self.grating_phases_range[0], self.grating_phases_range[1])
 
             self.ps_grating.ori = current_orientation
-            #self.ps_grating.phase = current_phase
+            self.ps_grating.phase = 0
 
             total_time = 0
             self.clock.reset()
 
-            print("STIM: {}".format(trial), self.master_clock.getTime())
             self.photodiode_square.color = self.square_color_on
+            self.exp_log.log_stimulus(self.master_clock.getTime(), trial, self.ps_grating)
             while self.clock.getTime() < self.stim_length:
                 self.ps_grating.phase = np.mod(self.clock.getTime() / 0.9, 1)
 
@@ -83,7 +86,11 @@ class SimpleOrientationExperiment(BaseExperiment):
         while self.clock.getTime() < self.experiment_delay:
             if self.clock.getTime() < self.experiment_delay/2:
                 self.photodiode_square.draw()
-                #TODO log end of exp (master_clock)
+                if not bool_logged_end:
+                    self.exp_log.log_exp_end(self.master_clock.getTime())
+                    bool_logged_end = True
             self.window.flip()
-        print(self.master_clock.getTime())
+
+        self.exp_log.print_log()
+
 

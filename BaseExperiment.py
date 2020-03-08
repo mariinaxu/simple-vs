@@ -38,7 +38,7 @@ class BaseExperiment(ABC):
         self.create_save_directories(save_settings_config_filename)
 
         # experiment trial params logger
-        self.exp_log = ExperimentLogger(self.experiment_log_filename) 
+        self.exp_log = ExperimentLogger(self.experiment_log_filename, self.experiment_id) 
         self.daq.ni_log_filename = self.ni_log_filename
 
         self.create_photodiode_square()
@@ -106,8 +106,8 @@ class BaseExperiment(ABC):
         dirs_to_make = save_settings["dirs_to_make"]
 
         # set the log filenames for the NI log and the exp log
-        self.experiment_log_filename = os.path.join(self.data_log_dir, save_settings['experiment_log'])
-        self.ni_log_filename = os.path.join(self.data_log_dir, save_settings['nidaq_log'])
+        self.experiment_log_filename = os.path.join(self.data_log_dir, "{}_exp_log.h5".format(self.experiment_id))
+        self.ni_log_filename = os.path.join(self.data_log_dir, "{}_ni_log.npy".format(self.experiment_id))
 
 
         if not os.path.exists(self.save_dir):
@@ -125,18 +125,22 @@ class BaseExperiment(ABC):
         if self.daq is None:
             raise Exception("Please set the daq object, it has not been set.")
 
-        self.daq.start_logging()  
-        self.daq.start_2p()
-        self.daq.start_cameras()
+        if platform == "win32":
+            self.daq.start_logging()  
+            self.daq.start_2p()
+            self.daq.start_cameras()
 
-        if not self.daq.wait_for_2p_aq():
-            raise Exception("2-photon microscope did not start acqsuisition...")
+            if not self.daq.wait_for_2p_aq():
+                raise Exception("2-photon microscope did not start acqsuisition...")
 
 
     def stop_data_acquisition(self,):
-        self.daq.stop_cameras()
-        self.daq.stop_2p()
-        self.daq.stop_logging()
+        if platform == "win32":
+            self.daq.stop_cameras()
+            self.daq.stop_2p()
+            self.daq.stop_logging()
+
+            self.daq.save_log(self.ni_log_filename)
 
 
 

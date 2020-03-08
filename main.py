@@ -26,9 +26,9 @@ def create_experiment_name():
 
 if __name__ == "__main__":
     experiment_id = create_experiment_name()
-    data_aq = DAQ()
+    data_aq = DAQ(experiment_id)
 
-    exp = SimpleOrientationExperiment(experiment_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "base_config.yaml", debug=bool_DEBUG)
+    exp = SimpleOrientationExperiment(experiment_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "simple_orientation_config.yaml", debug=bool_DEBUG)
 
     exp.load_experiment_config()
     exp.start_data_acquisition()
