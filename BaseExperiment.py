@@ -90,8 +90,9 @@ class BaseExperiment(ABC):
         self.square_color_off = self.monitor_settings['square_color_off']
         self.square_color_on = self.monitor_settings['square_color_on']
 
+        # Since 2020 psychopy argument 'color' was deprecated.
         self.photodiode_square = psychopy.visual.Rect(win=self.window, pos=self.square_position, width=self.square_size[0], height=self.square_size[1], 
-                                                      units='pix', color=self.square_color_off)
+                                                      units='pix', fillColor=self.square_color_off, lineColor=self.square_color_off)
 
 
     def create_save_directories(self, save_settings_config_filename):

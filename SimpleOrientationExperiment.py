@@ -70,7 +70,7 @@ class SimpleOrientationExperiment(BaseExperiment):
             total_time = 0
             self.clock.reset()
 
-            self.photodiode_square.color = self.square_color_on
+            self.photodiode_square.fillColor = self.photodiode_square.lineColor = self.square_color_on
             # Log stimulus
             # TODO figure out how to dump all the PS grating information easily....
             self.exp_log.log_stimulus(self.master_clock.getTime(), trial, current_orientation, 0)
@@ -83,7 +83,7 @@ class SimpleOrientationExperiment(BaseExperiment):
                 self.photodiode_square.draw()
 
                 self.window.flip()
-            self.photodiode_square.color = self.square_color_off
+            self.photodiode_square.fillColor = self.photodiode_square.lineColor = self.square_color_off
 
             total_time += self.stim_length
 
