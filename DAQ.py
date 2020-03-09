@@ -40,7 +40,7 @@ class DAQ:
     def create_NI_tasks(self):
         self.ai_log_task = ni.Task()
         self.ai_log_task.ai_channels.add_ai_voltage_chan("Dev1/ai0:7")
-        self.ai_log_task.ci_channels.add_ci_xx() #TODO
+        #self.ai_log_task.ci_channels.add_ci_xx() #TODO
         self.ai_log_task.timing.cfg_samp_clk_timing(rate=1000, sample_mode=ni.constants.AcquisitionType.CONTINUOUS)
         self.ai_log_task.register_every_n_samples_acquired_into_buffer_event(1000, self.data_read_callback)
 
