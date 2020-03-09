@@ -20,7 +20,7 @@ def create_experiment_name():
         # when debugging we make a fake tag 
         now = datetime.now()
         date = str(now).split(" ")[0].replace("-", "")[2:]
-        experiment_id = "M{}_12345_FB".format(date)
+        experiment_id = "M{}_12346_FB".format(date)
 
         mouse_id = "12345"
 
