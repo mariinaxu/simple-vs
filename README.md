@@ -9,3 +9,5 @@ Dependencies:
 * nidaqmx
 * numpy
 * pyaml
+* h5py
+* pandas 

@@ -1,8 +1,9 @@
 #Experiment config file
 # Basic file for parameters of the experiment
 # All delays in seconds
+name: "SimpleOrientationTuning"
 
-n_trials: 5
+n_trials: 2
 
 # the delay before starting and after ending the experiment (black square comes on at half of this time)
 experiment_delay: 3
@@ -19,3 +20,5 @@ grating_phases_range: [0, 1]
 grating_size: [180, 180]
 grating_mask: 'circle'
 
+
+trial_params_columns: ["trial_number", "clock_time", "orientation", "stim_info_str"]

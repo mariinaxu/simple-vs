@@ -13,8 +13,12 @@ class DAQ:
     def __init__(self, experiment_id):
         self.experiment_id = experiment_id
 
-        self.ip_address_list = ["127.0.0.1"]
-        self.port = 10001
+        # TODO make it a yaml settings
+        self.ip_address_list = ["172.17.150.226"]
+        if platform == "win32":
+            self.port = 1001
+        else:
+            self.port = 10001
 
         self.sock = socket.socket(socket.AF_INET,
                                   socket.SOCK_DGRAM)

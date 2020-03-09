@@ -11,6 +11,9 @@ class SimpleOrientationExperiment(BaseExperiment):
         with open (self.exp_parameters_filename, 'r') as file:
             self.exp_parameters = yaml.load(file, Loader=yaml.FullLoader)
 
+        # Name of experiment params
+        self.exp_protocol = self.exp_parameters['name']
+
         # Load n trials and timing lengths
         self.n_trials = self.exp_parameters['n_trials']
         self.experiment_delay = self.exp_parameters['experiment_delay']
@@ -29,6 +32,11 @@ class SimpleOrientationExperiment(BaseExperiment):
         self.ps_grating = psychopy.visual.GratingStim(win=self.window, units="deg", pos=self.grating_position, sf=self.grating_sf,
                                                        size=self.grating_size, mask=self.grating_mask)
 
+        # log the experiment parameters
+        self.exp_log.log.create_dataset("exp_parameters", data=self.exp_protocol)
+        self.exp_log.trial_params_columns = self.exp_parameters['trial_params_columns']
+        
+
 
 
     def run_experiment(self, ):
@@ -37,6 +45,7 @@ class SimpleOrientationExperiment(BaseExperiment):
         # pre experiment delay
         self.clock.reset()
         self.master_clock.reset()
+        
         # Half of the experiment delay there is no black square and then we draw it, that's when the experiment starts.
         while self.clock.getTime() < self.experiment_delay:
             if self.clock.getTime() >= self.experiment_delay/2:
@@ -50,17 +59,21 @@ class SimpleOrientationExperiment(BaseExperiment):
         self.absolute_total_time += self.experiment_delay
 
         for trial in range(self.n_trials):
+            print("Trial {} out of {}.".format(trial+1, self.n_trials))
             current_orientation = np.random.choice(self.grating_orientations)
             #current_phase = np.random.randint(self.grating_phases_range[0], self.grating_phases_range[1])
 
             self.ps_grating.ori = current_orientation
             self.ps_grating.phase = 0
 
+
             total_time = 0
             self.clock.reset()
 
             self.photodiode_square.color = self.square_color_on
-            self.exp_log.log_stimulus(self.master_clock.getTime(), trial, self.ps_grating)
+            # Log stimulus
+            # TODO figure out how to dump all the PS grating information easily....
+            self.exp_log.log_stimulus(self.master_clock.getTime(), trial, current_orientation, 0)
             while self.clock.getTime() < self.stim_length:
                 self.ps_grating.phase = np.mod(self.clock.getTime() / 0.9, 1)
 
@@ -87,10 +100,9 @@ class SimpleOrientationExperiment(BaseExperiment):
             if self.clock.getTime() < self.experiment_delay/2:
                 self.photodiode_square.draw()
                 if not bool_logged_end:
-                    self.exp_log.log_exp_end(self.master_clock.getTime())
+                    self.exp_log.log_exp_end(self.master_clock.getTime(), self.n_trials)
                     bool_logged_end = True
             self.window.flip()
 
-        self.exp_log.print_log()
-
+        self.exp_log.save_log()
 

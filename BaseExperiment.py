@@ -11,8 +11,9 @@ from sys import platform
 import os
 
 class BaseExperiment(ABC):
-    def __init__(self, experiment_id, daq, monitor_config_filename, save_settings_config_filename, exp_config_filename, debug):
+    def __init__(self, experiment_id, mouse_id, daq, monitor_config_filename, save_settings_config_filename, exp_config_filename, debug):
         self.experiment_id = experiment_id
+        self.mouse_id = mouse_id
         self.debug = debug
 
         # the NI daq logging class 
@@ -38,7 +39,7 @@ class BaseExperiment(ABC):
         self.create_save_directories(save_settings_config_filename)
 
         # experiment trial params logger
-        self.exp_log = ExperimentLogger(self.experiment_log_filename, self.experiment_id) 
+        self.exp_log = ExperimentLogger(self.experiment_log_filename, self.experiment_id, self.mouse_id) 
         self.daq.ni_log_filename = self.ni_log_filename
 
         self.create_photodiode_square()
