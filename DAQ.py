@@ -52,7 +52,8 @@ class DAQ:
         self.in_ttl_task.di_channels.add_di_chan("Dev1/port1/line0", line_grouping=ni.constants.LineGrouping.CHAN_FOR_ALL_LINES)    
 
 
-    def data_read_callback(self):
+    def data_read_callback(self, task_handle, every_n_samples_event_type,
+                    number_of_samples, callback_data):
         print('Every N Samples callback invoked.')
 
         samples = self.ai_log_task.read(number_of_samples_per_channel=1000)
