@@ -99,7 +99,7 @@ class BaseExperiment(ABC):
         with open(save_settings_config_filename, 'r') as file:
             save_settings = yaml.load(file, Loader=yaml.FullLoader)
 
-        if platform == "win-32":
+        if platform == "win32":
             self.save_dir = os.path.join(save_settings['LABSERVER_DIR_WIN'], self.experiment_id)
         else:
             self.save_dir = os.path.join(save_settings['LABSERVER_DIR_LIN'], self.experiment_id)
