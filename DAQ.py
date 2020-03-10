@@ -1,6 +1,6 @@
 from sys import platform
 import socket
-from time import sleep
+from time import sleep, time
 import numpy as np
 
 # control NI dacs only on windows
@@ -64,21 +64,25 @@ class DAQ:
 
     def send_message_to_list(self, message):
         message = message.encode()
-        print(message)
         for address in self.ip_address_list:
+            print(message, address, self.port)
             self.sock.sendto(message, (address, self.port)) 
 
 
     def start_cameras(self):
-        message = "ExpStart {} 1 1".format(self.experiment_id)
+        message1 = "ExpStart {} 1 1".format(self.experiment_id)
+        message2 = "BlockStart {} 1 1 1".format(self.experiment_id)
 
-        self.send_message_to_list(message)
+        self.send_message_to_list(message1)
+        self.send_message_to_list(message2)
 
 
     def stop_cameras(self):
-        message = "ExpEnd {} 1 1".format(self.experiment_id)
+        message1 = "BlockEnd {} 1 1 1".format(self.experiment_id)
+        message2 = "ExpEnd {} 1 1".format(self.experiment_id)
 
-        self.send_message_to_list(message)
+        self.send_message_to_list(message1)
+        self.send_message_to_list(message2)
 
 
     # send a high ttl to trigger 2p acquisition
@@ -87,9 +91,15 @@ class DAQ:
 
         
     def wait_for_2p_aq(self):
-        while (not self.in_ttl_task.read()[0]):
-            pass
-        print(self.in_ttl_task.read())
+        t_start = time()
+        print("Waiting for 2p")
+        while (time()-t_start < 3):
+            ret = self.in_ttl_task.read()[0]
+            if not ret:
+                print("Response received after: {}".format(time()-t_start))
+                return True
+
+        return False
 
     
     def stop_2p(self):
@@ -106,8 +116,9 @@ class DAQ:
 
     def save_log(self, filename):
         self.data = np.asarray(self.data)
-        np.save(self.data, filename)
-        print("Saved NI log: ", filename)
+        
+        np.save(filename, self.data)
+        print("Saved NI log (size): ", filename, self.data.shape)
 
 
 if __name__ == "__main__":

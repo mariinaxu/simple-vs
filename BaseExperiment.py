@@ -9,6 +9,7 @@ import psychopy.monitors
 import yaml
 from sys import platform
 import os
+from time import sleep
 
 class BaseExperiment(ABC):
     def __init__(self, experiment_id, mouse_id, daq, monitor_config_filename, save_settings_config_filename, exp_config_filename, debug):
@@ -140,6 +141,9 @@ class BaseExperiment(ABC):
         if platform == "win32":
             self.daq.stop_cameras()
             self.daq.stop_2p()
+            #TODO how does 2p tell us it's done capturing.
+            print("Waiting additional 3 seconds before stopping logging.")
+            sleep(3)
             self.daq.stop_logging()
 
             self.daq.save_log(self.ni_log_filename)
