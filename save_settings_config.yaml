@@ -2,7 +2,7 @@ LABSERVER_DIR_WIN: "\\NCB-LABSERVER6\MOUSE\FB_2P_Analysis\2p_TEX\"
 LABSERVER_DIR_LIN: "/home/k1n4s3/LABSERVER6/MOUSE/FB_2P_Analysis/2p_TEX/"
 #LABSERVER_DIR_LIN: "~/LABSERVERX/MOUSE/FB_2P_Analysis/2p_TEX/"
 
-dirs_to_make: ["VSLogs", "NikonData", "BT", "ET", "Segmented", "Figures"]
+dirs_to_make: ["VSLogs", "2p", "BT", "ET", "Segmented", "Figures"]
 
 # Folder where the DAQ data and the VS trials param data is saved
 log_folder: "VSLogs"

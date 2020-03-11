@@ -10,7 +10,7 @@ from datetime import datetime
 from DAQ import DAQ
 from SimpleOrientationExperiment import SimpleOrientationExperiment
 
-bool_DEBUG = False
+bool_DEBUG = True
 
 def create_experiment_name():
     if not bool_DEBUG:

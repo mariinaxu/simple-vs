@@ -3,7 +3,7 @@
 # All delays in seconds
 name: "SimpleOrientationTuning"
 
-n_trials: 20
+n_trials: 30
 
 # the delay before starting and after ending the experiment (black square comes on at half of this time)
 experiment_delay: 3

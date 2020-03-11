@@ -75,7 +75,7 @@ class SimpleOrientationExperiment(BaseExperiment):
             # TODO figure out how to dump all the PS grating information easily....
             self.exp_log.log_stimulus(self.master_clock.getTime(), trial, current_orientation, 0)
             while self.clock.getTime() < self.stim_length:
-                self.ps_grating.phase = np.mod(self.clock.getTime() / 0.9, 1)
+                self.ps_grating.phase = np.mod(self.clock.getTime(), 1)
 
                 # log stim ON
 

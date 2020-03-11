@@ -134,6 +134,8 @@ class BaseExperiment(ABC):
             self.daq.start_cameras()
 
             if not self.daq.wait_for_2p_aq():
+                self.daq.__del__()
+                print("Destructor called.")
                 raise Exception("2-photon microscope did not start acqsuisition...")
 
 
