@@ -106,6 +106,7 @@ class SimpleOrientationExperiment(BaseExperiment):
         while self.clock.getTime() < self.experiment_delay:
             if self.clock.getTime() < self.experiment_delay/2:
                 self.photodiode_square.draw()
+            if self.clock.getTime() >= self.experiment_delay/2:
                 if not bool_logged_end:
                     self.exp_log.log_exp_end(self.master_clock.getTime(), self.n_trials)
                     bool_logged_end = True

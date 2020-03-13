@@ -10,7 +10,7 @@ from datetime import datetime
 from DAQ import DAQ
 from SimpleOrientationExperiment import SimpleOrientationExperiment
 
-bool_DEBUG = True
+bool_DEBUG = False
 
 def create_experiment_name():
     if not bool_DEBUG:
@@ -49,5 +49,6 @@ if __name__ == "__main__":
             pass
         if exp.acquisition_running:
             exp.stop_data_acquisition()
-            del data_aq
+    finally:
+        del exp.data_aq
 
