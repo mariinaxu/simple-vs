@@ -20,6 +20,9 @@ class DAQ:
         else:
             self.port = 10001
 
+        # TODO make into a proper setting????
+        self.sampling_rate = 5000
+
         self.sock = socket.socket(socket.AF_INET,
                                   socket.SOCK_DGRAM)
 
@@ -41,8 +44,8 @@ class DAQ:
         self.ai_log_task = ni.Task()
         self.ai_log_task.ai_channels.add_ai_voltage_chan("Dev1/ai0:7")
         #self.ai_log_task.ci_channels.add_ci_xx() #TODO
-        self.ai_log_task.timing.cfg_samp_clk_timing(rate=5000, sample_mode=ni.constants.AcquisitionType.CONTINUOUS)
-        self.ai_log_task.register_every_n_samples_acquired_into_buffer_event(5000, self.data_read_callback)
+        self.ai_log_task.timing.cfg_samp_clk_timing(rate=self.sampling_rate, sample_mode=ni.constants.AcquisitionType.CONTINUOUS)
+        self.ai_log_task.register_every_n_samples_acquired_into_buffer_event(self.sampling_rate, self.data_read_callback)
 
         self.out_ttl_task = ni.Task()
         self.out_ttl_task.do_channels.add_do_chan("Dev1/port0/line1", line_grouping=ni.constants.LineGrouping.CHAN_FOR_ALL_LINES)
@@ -54,9 +57,9 @@ class DAQ:
 
     def data_read_callback(self, task_handle, every_n_samples_event_type,
                     number_of_samples, callback_data):
-        print('Every N Samples callback invoked.')
+        #print('Every N Samples callback invoked.')
 
-        samples = self.ai_log_task.read(number_of_samples_per_channel=5000)
+        samples = self.ai_log_task.read(number_of_samples_per_channel=self.sampling_rate)
         self.data.append(samples)
 
         return 0

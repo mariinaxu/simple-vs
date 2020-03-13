@@ -17,6 +17,9 @@ class BaseExperiment(ABC):
         self.mouse_id = mouse_id
         self.debug = debug
 
+        self.acquisition_running = False
+        self.experiment_running = False
+
         # the NI daq logging class 
         self.daq = daq
 
@@ -129,13 +132,12 @@ class BaseExperiment(ABC):
             raise Exception("Please set the daq object, it has not been set.")
 
         if platform == "win32":
+            self.acquisition_running = True
             self.daq.start_logging()  
             self.daq.start_2p()
             self.daq.start_cameras()
 
             if not self.daq.wait_for_2p_aq():
-                self.daq.__del__()
-                print("Destructor called.")
                 raise Exception("2-photon microscope did not start acqsuisition...")
 
 
@@ -149,6 +151,7 @@ class BaseExperiment(ABC):
             self.daq.stop_logging()
 
             self.daq.save_log(self.ni_log_filename)
+            self.acquisition_running = False
 
 
 

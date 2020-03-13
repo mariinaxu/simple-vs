@@ -28,17 +28,26 @@ def create_experiment_name():
 
 
 if __name__ == "__main__":
-    experiment_id, mouse_id = create_experiment_name()
-    data_aq = DAQ(experiment_id)
+    try:
+        experiment_id, mouse_id = create_experiment_name()
+        data_aq = DAQ(experiment_id)
 
-    exp = SimpleOrientationExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "simple_orientation_config.yaml", debug=bool_DEBUG)
+        exp = SimpleOrientationExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "simple_orientation_config.yaml", debug=bool_DEBUG)
 
-    exp.load_experiment_config()
-    exp.start_data_acquisition()
+        exp.load_experiment_config()
+        exp.start_data_acquisition()
 
-    exp.run_experiment()
+        exp.run_experiment()
 
-    exp.stop_data_acquisition()
+        exp.stop_data_acquisition()
 
-    print("ALL DONE with experiment {}! ".format(experiment_id))
+        print("ALL DONE with experiment {}! ".format(experiment_id))
+    except KeyboardInterrupt:
+        print("Received CTRL-C event")
+        if exp.experiment_running:
+            # We need to run the stopping functions.
+            pass
+        if exp.acquisition_running:
+            exp.stop_data_acquisition()
+            del data_aq
 

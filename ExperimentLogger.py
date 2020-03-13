@@ -14,6 +14,7 @@ class ExperimentLogger():
         self.log.create_dataset('datetime_start', data=time())
         self.log.create_dataset('datetime_start_str', data=str(datetime.now()))
 
+
         self.trial_params = []
         self.trial_params_columns = None
 

@@ -24,6 +24,7 @@ class SimpleOrientationExperiment(BaseExperiment):
         self.grating_sf = self.exp_parameters['grating_sf']
         self.grating_position = self.exp_parameters['grating_position']
         self.grating_orientations = self.exp_parameters['grating_orientations']
+        self.grating_phase_temporal_frequency = self.exp_parameters['grating_phase_temporal_frequency']
         self.grating_phases_range = self.exp_parameters['grating_phases_range']
         self.grating_size = self.exp_parameters['grating_size']
         self.grating_mask = self.exp_parameters['grating_mask']
@@ -35,11 +36,16 @@ class SimpleOrientationExperiment(BaseExperiment):
         # log the experiment parameters
         self.exp_log.log.create_dataset("exp_parameters", data=self.exp_protocol)
         self.exp_log.trial_params_columns = self.exp_parameters['trial_params_columns']
+
+        # Save DAQ params into the log
+        # TODO improve, I feel like calls to create_dset should be within DAQ class
+        self.exp_log.log.create_dataset("daq_sampling_rate", data=self.daq.sampling_rate)
         
 
 
 
     def run_experiment(self, ):
+        self.experiment_running = True
         bool_logged_start = False
         bool_logged_end = False
         # pre experiment delay
@@ -75,10 +81,11 @@ class SimpleOrientationExperiment(BaseExperiment):
             # TODO figure out how to dump all the PS grating information easily....
             self.exp_log.log_stimulus(self.master_clock.getTime(), trial, current_orientation, 0)
             while self.clock.getTime() < self.stim_length:
+
+                # temporal frequency change
                 self.ps_grating.phase = np.mod(self.clock.getTime(), 1)
 
                 # log stim ON
-
                 self.ps_grating.draw()
                 self.photodiode_square.draw()
 
@@ -105,4 +112,5 @@ class SimpleOrientationExperiment(BaseExperiment):
             self.window.flip()
 
         self.exp_log.save_log()
+        self.experiment_running = False
 
