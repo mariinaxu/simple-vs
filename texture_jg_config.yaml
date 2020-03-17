@@ -1,0 +1,25 @@
+#Experiment config file
+# Basic file for parameters of the experiment
+# All delays in seconds
+name: "TextureExperimentJG"
+
+images_filename: "/home/k1n4s3/LABSERVER6/Personal/Federico/TextureProject/all_miniblock_images.npy"
+
+n_trials: 5
+
+# the delay before starting and after ending the experiment (black square comes on at half of this time)
+experiment_delay: 3
+image_period: 0.5
+inter_trial_delay: 2.5
+
+#Parameters of visual stimuli
+
+# 4 moving orientation gratings
+image_position: [0, 0]
+image_size: [60, 60]
+image_mask: 'circle'
+image_mask_sd: 2
+
+
+
+trial_params_columns: ["trial_number", "clock_time", "orientation", "stim_info_str"]

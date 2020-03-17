@@ -9,6 +9,7 @@ from datetime import datetime
 
 from DAQ import DAQ
 from SimpleOrientationExperiment import SimpleOrientationExperiment
+from TextureExperimentJG import TextureExperimentJG
 
 bool_DEBUG = True
 
@@ -32,7 +33,8 @@ if __name__ == "__main__":
         experiment_id, mouse_id = create_experiment_name()
         data_aq = DAQ(experiment_id)
 
-        exp = SimpleOrientationExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "simple_orientation_config.yaml", debug=bool_DEBUG)
+        #exp = SimpleOrientationExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "simple_orientation_config.yaml", debug=bool_DEBUG)
+        exp = TextureExperimentJG(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "texture_jg_config.yaml", debug=bool_DEBUG)
 
         exp.load_experiment_config()
         exp.start_data_acquisition()
