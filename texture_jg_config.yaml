@@ -17,8 +17,8 @@ inter_trial_delay: 2.5
 # 4 moving orientation gratings
 image_position: [0, 0]
 image_size: [60, 60]
-image_mask: 'circle'
-image_mask_sd: 2
+image_mask: 'gauss'
+image_mask_sd: 3.5
 
 
 
