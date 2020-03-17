@@ -3,7 +3,7 @@
 # All delays in seconds
 name: "SimpleOrientationTuning"
 
-n_trials: 100
+n_trials: 5
 
 # the delay before starting and after ending the experiment (black square comes on at half of this time)
 experiment_delay: 3
@@ -15,7 +15,8 @@ inter_trial_delay: 2.5
 # 4 moving orientation gratings
 grating_sf: 0.08
 grating_position: [0, 0]
-grating_orientations: [0, 45, 90]
+grating_orientations: [0, 45, 90, 135]
+give_blanks: True
 grating_phases_range: [0, 1]
 grating_phase_temporal_frequency: 1 # in Hz
 grating_size: [180, 180]

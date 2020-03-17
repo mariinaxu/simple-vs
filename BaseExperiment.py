@@ -112,7 +112,7 @@ class BaseExperiment(ABC):
         dirs_to_make = save_settings["dirs_to_make"]
 
         # set the log filenames for the NI log and the exp log
-        self.experiment_log_filename = os.path.join(self.data_log_dir, "{}_exp_log.h5".format(self.experiment_id))
+        self.experiment_log_filename = os.path.join(self.data_log_dir, "{}_exp_log".format(self.experiment_id))
         self.ni_log_filename = os.path.join(self.data_log_dir, "{}_ni_log.npy".format(self.experiment_id))
 
 
