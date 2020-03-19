@@ -5,13 +5,15 @@ import psychopy.event
 import psychopy.monitors
 import numpy as np
 import yaml
+import pandas as pd
 
-class TextureExperimentJG(BaseExperiment):
+class TextureExperimentFB(BaseExperiment):
     def load_experiment_config(self, ):
         with open (self.exp_parameters_filename, 'r') as file:
             self.exp_parameters = yaml.load(file, Loader=yaml.FullLoader)
 
         self.images_filename = self.exp_parameters['images_filename']
+        self.images_properties_filename = self.exp_parameters['images_properties_filename']
         self.experiment_delay = self.exp_parameters['experiment_delay']
 
         self.image_size = self.exp_parameters['image_size']
@@ -20,9 +22,16 @@ class TextureExperimentJG(BaseExperiment):
         self.image_period = self.exp_parameters['image_period']
         self.image_mask_sd = self.exp_parameters['image_mask_sd']
         
+        self.chosen_families = self.exp_parameters['chosen_families']
+        self.chosen_subfamilies = self.exp_parameters['chosen_subfamilies']
+
         self.images = None
         self.n_images = None
+        self.image_properties = None
         self.load_images()
+
+        self.experiment_image_indices = []
+        self.create_randomization()
 
 
         self.image_stim = psychopy.visual.ImageStim(win=self.window, image=None, units="deg", pos=self.image_position,
@@ -36,6 +45,20 @@ class TextureExperimentJG(BaseExperiment):
         self.images /= 128
         print("Done!")
 
+        print("Loading all image properties...", flush=False)
+        self.image_properties = pd.read_hdf(self.images_properties_filename)
+
+
+        # Let's check to make sure we have the same number of textures and noise 
+        assert (self.image_properties.iloc[np.where(self.image_properties['stim_type'] == 'texture')[0]].count() == 
+                self.image_properties.iloc[np.where(self.image_properties['stim_type'] == 'noise')[0]].count()).all()
+
+
+    def create_randomization(self):
+        noise_start_index = im_df.shape[0]//2
+
+        # DataFrame containing only textures
+        tex_df = im_df[:][:noise_start_index]
 
 
 
