@@ -34,7 +34,7 @@ if __name__ == "__main__":
         data_aq = DAQ(experiment_id)
 
         #exp = SimpleOrientationExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "simple_orientation_config.yaml", debug=bool_DEBUG)
-        exp = TextureExperimentFB(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "texture_jg_config.yaml", debug=bool_DEBUG)
+        exp = TextureExperimentFB(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "texture_FB_config.yaml", debug=bool_DEBUG)
 
         exp.load_experiment_config()
         exp.start_data_acquisition()
