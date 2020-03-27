@@ -21,10 +21,10 @@ vignette_filename: "/home/k1n4s3/LABSERVER6/Personal/Federico/TextureProject/vig
 chosen_stim_types: ['texture', 'noise']
 chosen_families: ['scales', 'worms', 'leopard', 'clouds']
 chosen_subfamilies: ['pool4', 'pool2']
-
-
-
 give_blanks: True
+
+
+
 # of texture and blanks how many images of each to display?
 # we will show the same 
 n_stims_per_condition: 1 # currently 2*4*2 = (16 + 1 (blank)) * 25 = 425 images 
@@ -32,15 +32,15 @@ n_stims_per_condition: 1 # currently 2*4*2 = (16 + 1 (blank)) * 25 = 425 images
 
 
 # the delay before starting and after ending the experiment (black square comes on at half of this time)
-experiment_delay: 8
+experiment_delay: 2
 image_repeat_times: 3 # n times to repeat image, the last period does not have an image off period and goes into ITI
 image_on_period: 0.75
 image_off_period: 0.125
 inter_trial_delay: 2.5
 
 #Parameters of visual stimuli
-image_position: [0, 0]
-image_size: [60, 60]
+image_position: [-25, 0]
+image_size: [100, 100]
 image_mask: None
 image_mask_sd: 0
 

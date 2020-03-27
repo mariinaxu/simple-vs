@@ -3,18 +3,19 @@ import socket
 from time import sleep, time
 import numpy as np
 
-# control NI dacs only on windows
+# control National Instruments data aq board only on windows
 if platform == "win32":
     import nidaqmx as ni
 
 
+
 # TODO consider making a BaseDAQ such that one can use the pco system too
-class DAQ:
+class NISDAQ:
     def __init__(self, experiment_id):
         self.experiment_id = experiment_id
 
         # TODO make it a yaml settings
-        self.ip_address_list = ["172.17.150.226"]
+        self.ip_address_list = ["172.17.150.226", "172.17.150.67"]
         if platform == "win32":
             self.port = 1001
         else:
@@ -22,10 +23,10 @@ class DAQ:
 
         # TODO make into a proper setting????
         self.sampling_rate = 5000
-
         self.sock = socket.socket(socket.AF_INET,
                                   socket.SOCK_DGRAM)
 
+        self.ni_log_filename = None
         self.data = []
 
         if platform == "win32":
@@ -86,6 +87,27 @@ class DAQ:
 
         self.send_message_to_list(message1)
         self.send_message_to_list(message2)
+
+    def start_everything(self):
+        self.start_logging()  
+        self.start_2p()
+        self.start_cameras()
+
+        if not self.wait_for_2p_aq():
+            raise Exception("2-photon microscope did not start acqsuisition...")
+
+
+    def stop_everything(self):
+        if platform == "win32":
+            self.stop_cameras()
+            self.stop_2p()
+            #TODO how does 2p tell us it's done capturing.
+            print("Waiting additional 3 seconds before stopping logging.")
+            sleep(3)
+            self.stop_logging()
+
+            self.save_log(self.ni_log_filename)
+            self.acquisition_running = False
 
 
     # send a high ttl to trigger 2p acquisition

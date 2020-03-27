@@ -1,6 +1,4 @@
 from abc import ABC, abstractmethod
-
-from DAQ import DAQ
 from ExperimentLogger import ExperimentLogger
 
 import psychopy.visual
@@ -22,6 +20,7 @@ class BaseExperiment(ABC):
 
         # the NI daq logging class 
         self.daq = daq
+        
 
         self.monitor = None
         self.monitor_settings = None
@@ -47,6 +46,10 @@ class BaseExperiment(ABC):
         self.daq.ni_log_filename = self.ni_log_filename
 
         self.create_photodiode_square()
+
+        # Common exp log    
+        self.exp_log.log['daq_sampling_rate'] = self.daq.sampling_rate
+
 
 
 
@@ -133,27 +136,13 @@ class BaseExperiment(ABC):
 
         if platform == "win32":
             self.acquisition_running = True
-            self.daq.start_logging()  
-            self.daq.start_2p()
-            self.daq.start_cameras()
-
-            if not self.daq.wait_for_2p_aq():
-                raise Exception("2-photon microscope did not start acqsuisition...")
+            self.daq.start_everything()
 
 
     def stop_data_acquisition(self,):
         if platform == "win32":
-            self.daq.stop_cameras()
-            self.daq.stop_2p()
-            #TODO how does 2p tell us it's done capturing.
-            print("Waiting additional 3 seconds before stopping logging.")
-            sleep(3)
-            self.daq.stop_logging()
-
-            self.daq.save_log(self.ni_log_filename)
+            self.daq.stop_everything()
             self.acquisition_running = False
-
-
 
 
     @abstractmethod
