@@ -34,7 +34,7 @@ if __name__ == "__main__":
     try:
         experiment_id, mouse_id = create_experiment_name()
         # change the line below to use PCO or NIS (2p)
-        data_aq = NISDAQ(experiment_id)
+        data_aq = PCODAQ(experiment_id)
 
         #exp = SimpleOrientationExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "simple_orientation_config.yaml", debug=bool_DEBUG)
         exp = TextureExperimentFB(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "texture_FB_config.yaml", debug=bool_DEBUG)

@@ -15,7 +15,7 @@ class DAQ:
         self.experiment_id = experiment_id
 
         # TODO make it a yaml settings
-        self.ip_address_list = ["172.17.150.226", "172.17.150.67"]
+        self.ip_address_list = ["172.17.150.202"]
         if platform == "win32":
             self.port = 1001
         else:
@@ -23,10 +23,10 @@ class DAQ:
 
         # TODO make into a proper setting????
         self.sampling_rate = 5000
-
         self.sock = socket.socket(socket.AF_INET,
                                   socket.SOCK_DGRAM)
 
+        self.ni_log_filename = None
         self.data = []
 
         if platform == "win32":
@@ -36,8 +36,6 @@ class DAQ:
     def __del__(self):
         if platform == "win32":
             self.ai_log_task.close()
-            self.out_ttl_task.close()
-            self.in_ttl_task.close()
 
 
     # TODO make the channels into a settings file somehow...
@@ -48,12 +46,6 @@ class DAQ:
         self.ai_log_task.timing.cfg_samp_clk_timing(rate=self.sampling_rate, sample_mode=ni.constants.AcquisitionType.CONTINUOUS)
         self.ai_log_task.register_every_n_samples_acquired_into_buffer_event(self.sampling_rate, self.data_read_callback)
 
-        self.out_ttl_task = ni.Task()
-        self.out_ttl_task.do_channels.add_do_chan("Dev1/port0/line1", line_grouping=ni.constants.LineGrouping.CHAN_FOR_ALL_LINES)
-
-        self.in_ttl_task = ni.Task()
-        self.in_ttl_task.di_channels.add_di_chan("Dev1/port0/line3", line_grouping=ni.constants.LineGrouping.CHAN_FOR_ALL_LINES)
-        self.in_ttl_task.di_channels.add_di_chan("Dev1/port1/line0", line_grouping=ni.constants.LineGrouping.CHAN_FOR_ALL_LINES)    
 
 
     def data_read_callback(self, task_handle, every_n_samples_event_type,
@@ -88,31 +80,19 @@ class DAQ:
         self.send_message_to_list(message1)
         self.send_message_to_list(message2)
 
-    def daq_start_everything(self):
-        self.start_logging()  
-        self.start_2p()
+    def start_everything(self):
+        self.start_logging()
+        sleep(1)  
         self.start_cameras()
-
-    # send a high ttl to trigger 2p acquisition
-    def start_2p(self):
-        self.out_ttl_task.write([True])
-
-        
-    def wait_for_2p_aq(self):
-        t_start = time()
-        print("Waiting for 2p")
-        while (time()-t_start < 3):
-            ret = self.in_ttl_task.read()[0]
-            if not ret:
-                print("Response received after: {}".format(time()-t_start))
-                return True
-
-        return False
-
     
-    def stop_2p(self):
-        self.out_ttl_task.write([False])
+    def stop_everything(self):
+        self.stop_cameras()
+        print("Waiting additional 3 seconds before stopping logging.")
+        sleep(3)
+        self.stop_logging()
 
+        self.save_log(self.ni_log_filename)
+        self.acquisition_running = False
 
     def start_logging(self):
         self.ai_log_task.start()

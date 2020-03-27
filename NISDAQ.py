@@ -89,7 +89,8 @@ class NISDAQ:
         self.send_message_to_list(message2)
 
     def start_everything(self):
-        self.start_logging()  
+        self.start_logging()
+        sleep(1)  
         self.start_2p()
         self.start_cameras()
 
@@ -98,16 +99,14 @@ class NISDAQ:
 
 
     def stop_everything(self):
-        if platform == "win32":
-            self.stop_cameras()
-            self.stop_2p()
-            #TODO how does 2p tell us it's done capturing.
-            print("Waiting additional 3 seconds before stopping logging.")
-            sleep(3)
-            self.stop_logging()
+        self.stop_cameras()
+        self.stop_2p()
+        #TODO how does 2p tell us it's done capturing.
+        print("Waiting additional 3 seconds before stopping logging.")
+        sleep(3)
+        self.stop_logging()
 
-            self.save_log(self.ni_log_filename)
-            self.acquisition_running = False
+        self.save_log(self.ni_log_filename)
 
 
     # send a high ttl to trigger 2p acquisition
