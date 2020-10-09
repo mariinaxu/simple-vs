@@ -139,7 +139,7 @@ class NISDAQ:
 
 
     def save_log(self, filename):
-        self.data = np.asarray(self.data)
+        self.data = np.asarray(self.data).astype(np.float16)
         
         np.save(filename, self.data)
         print("Saved NI log (size): ", filename, self.data.shape)

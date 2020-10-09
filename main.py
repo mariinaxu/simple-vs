@@ -12,8 +12,9 @@ from PCODAQ import PCODAQ
 
 from SimpleOrientationExperiment import SimpleOrientationExperiment
 from TextureExperimentFB import TextureExperimentFB
+from TextureExperimentFBVGG import TextureExperimentFBVGG
 
-bool_DEBUG = True
+bool_DEBUG = False
 
 def create_experiment_name():
     if not bool_DEBUG:
@@ -23,7 +24,7 @@ def create_experiment_name():
         # when debugging we make a fake tag 
         now = datetime.now()
         date = str(now).split(" ")[0].replace("-", "")[2:]
-        experiment_id = "M{}_12346_FB".format(date)
+        experiment_id = "M{}_123411_FB".format(date)
 
         mouse_id = "12345"
 
@@ -34,10 +35,10 @@ if __name__ == "__main__":
     try:
         experiment_id, mouse_id = create_experiment_name()
         # change the line below to use PCO or NIS (2p)
-        data_aq = PCODAQ(experiment_id)
+        data_aq = NISDAQ(experiment_id)
 
         #exp = SimpleOrientationExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "simple_orientation_config.yaml", debug=bool_DEBUG)
-        exp = TextureExperimentFB(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "texture_FB_config.yaml", debug=bool_DEBUG)
+        exp = TextureExperimentFBVGG(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "texture_FB-VGG_config.yaml", debug=bool_DEBUG)
 
         exp.load_experiment_config()
         exp.start_data_acquisition()

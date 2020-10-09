@@ -10,12 +10,12 @@ if platform == "win32":
 
 
 # TODO consider making a BaseDAQ such that one can use the pco system too
-class DAQ:
+class PCODAQ:
     def __init__(self, experiment_id):
         self.experiment_id = experiment_id
 
         # TODO make it a yaml settings
-        self.ip_address_list = ["172.17.150.202"]
+        self.ip_address_list = ["172.17.150.209"]
         if platform == "win32":
             self.port = 1001
         else:
@@ -36,6 +36,8 @@ class DAQ:
     def __del__(self):
         if platform == "win32":
             self.ai_log_task.close()
+            self.out_ttl_task.close()
+
 
 
     # TODO make the channels into a settings file somehow...
@@ -45,6 +47,10 @@ class DAQ:
         #self.ai_log_task.ci_channels.add_ci_xx() #TODO
         self.ai_log_task.timing.cfg_samp_clk_timing(rate=self.sampling_rate, sample_mode=ni.constants.AcquisitionType.CONTINUOUS)
         self.ai_log_task.register_every_n_samples_acquired_into_buffer_event(self.sampling_rate, self.data_read_callback)
+		
+	
+        self.out_ttl_task = ni.Task()
+        self.out_ttl_task.do_channels.add_do_chan("Dev1/port0/line1", line_grouping=ni.constants.LineGrouping.CHAN_FOR_ALL_LINES)
 
 
 
@@ -83,9 +89,12 @@ class DAQ:
     def start_everything(self):
         self.start_logging()
         sleep(1)  
+        self.start_pco()
         self.start_cameras()
+        sleep(1)
     
     def stop_everything(self):
+        self.stop_pco()
         self.stop_cameras()
         print("Waiting additional 3 seconds before stopping logging.")
         sleep(3)
@@ -100,10 +109,17 @@ class DAQ:
 
     def stop_logging(self):
         self.ai_log_task.stop()
+		
+	# send a high ttl to trigger 2p acquisition
+    def start_pco(self):
+        self.out_ttl_task.write([True])
+		
+    def stop_pco(self):
+        self.out_ttl_task.write([False])
 
 
     def save_log(self, filename):
-        self.data = np.asarray(self.data)
+        self.data = np.asarray(self.data).astype(np.float16)
         
         np.save(filename, self.data)
         print("Saved NI log (size): ", filename, self.data.shape)
