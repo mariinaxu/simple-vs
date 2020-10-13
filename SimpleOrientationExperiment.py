@@ -70,7 +70,6 @@ class SimpleOrientationExperiment(BaseExperiment):
 
 
     def run_experiment(self, ):
-        print("trying to run")
         self.experiment_running = True
         bool_logged_start = False
         bool_logged_end = False

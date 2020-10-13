@@ -27,7 +27,6 @@ class DynamicBatteryExperiment(BaseExperiment):
         self.grating_orientations = self.exp_parameters['grating_orientations']
         self.give_blanks = self.exp_parameters['give_blanks']
         #self.grating_phase_temporal_frequency = self.exp_parameters['grating_phase_temporal_frequency']
-        self.grating_phases = self.exp_parameters['grating_phases']
         self.grating_sizes = self.exp_parameters['grating_sizes']
         self.grating_mask = self.exp_parameters['grating_mask']
 
@@ -56,8 +55,7 @@ class DynamicBatteryExperiment(BaseExperiment):
         for ori in self.grating_orientations:
             for sf in self.grating_sfs:
                 for size in self.grating_sizes:
-                    for phase in self.grating_phases:
-                        all_possible_stims.append([ori, sf, size, phase])
+                    all_possible_stims.append([ori, sf, size])
 
         if self.give_blanks:
             all_possible_stims.append('blank')
@@ -101,7 +99,6 @@ class DynamicBatteryExperiment(BaseExperiment):
             current_orientation = self.experiment_stims[trial][0]
             current_sf = self.experiment_stims[trial][1]
             current_size = self.experiment_stims[trial][2]
-            current_phase = self.experiment_stims[trial][3]
 
             #current_phase = np.random.randint(self.grating_phases_range[0], self.grating_phases_range[1])
 
@@ -109,8 +106,8 @@ class DynamicBatteryExperiment(BaseExperiment):
                 self.ps_grating.ori = current_orientation
                 self.ps_grating.sf = current_sf
                 self.ps_grating.size = current_size
-                #self.ps_grating.phase = current_phase
-            #self.ps_grating.phase = 0
+                
+            
 
 
             total_time = 0
@@ -119,7 +116,7 @@ class DynamicBatteryExperiment(BaseExperiment):
             self.photodiode_square.fillColor = self.photodiode_square.lineColor = self.square_color_on
             # Log stimulus
             # TODO figure out how to dump all the PS grating information easily....
-            self.exp_log.log_stimulus(self.master_clock.getTime(), trial, [current_orientation, current_sf, current_size, current_phase], 0)
+            self.exp_log.log_stimulus(self.master_clock.getTime(), trial, [current_orientation, current_sf, current_size], 0)
             while self.clock.getTime() < self.stim_length:
 
                 # temporal frequency change
