@@ -36,6 +36,7 @@ class BaseExperiment(ABC):
         self.load_monitor(monitor_config_filename)
         self.load_window()
 
+
         self.save_dir = None
         self.experiment_log_filename = None
         self.ni_log_filename = None
@@ -75,7 +76,7 @@ class BaseExperiment(ABC):
 
         
         # TODO  check if monitor needs to get saved in win
-        #mon.save()
+        #self.monitor.save()
 
     def load_window(self):
         self.window = psychopy.visual.Window(monitor=self.monitor, 
@@ -86,7 +87,7 @@ class BaseExperiment(ABC):
                                             units='deg',
                                             screen=self.monitor_settings['screen_id'],
                                             allowGUI=False,
-                                            fullscr=True,
+                                            fullscr=False,
                                             waitBlanking=True)
 
 

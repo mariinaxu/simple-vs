@@ -53,7 +53,14 @@ class ExperimentLogger():
 
         log_row.append(trial_number)
         log_row.append(clock_time)
-        log_row.append(stimulus_info)
+
+        # TODO: this looks so dirty
+        try:
+            for element in stimulus_info:
+                log_row.append(element)
+        except:
+            log_row.append(stimulus_info)
+
         log_row.append(stimulus_info_str)
 
         self.trial_params.append(log_row)

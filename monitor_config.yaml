@@ -4,7 +4,7 @@ monitor_name: 'FED_IIYAMA_23'
 monitor_width_pixels: 1920
 monitor_height_pixels: 1080
 monitor_width_cm: 52.2
-screen_id: 1
+screen_id: 0
 viewing_distance_cm: 25
 monitor_gamma: 1
 

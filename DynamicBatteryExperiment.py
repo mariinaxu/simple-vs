@@ -6,13 +6,14 @@ import psychopy.monitors
 import numpy as np
 import yaml
 
-class SimpleOrientationExperiment(BaseExperiment):
+class DynamicBatteryExperiment(BaseExperiment):
     def load_experiment_config(self, ):
         with open (self.exp_parameters_filename, 'r') as file:
             self.exp_parameters = yaml.load(file, Loader=yaml.FullLoader)
 
         # Name of experiment params
         self.exp_protocol = self.exp_parameters['name']
+
 
         # Load n trials and timing lengths
         self.n_trials = self.exp_parameters['n_trials']
@@ -21,13 +22,13 @@ class SimpleOrientationExperiment(BaseExperiment):
         self.inter_trial_delay = self.exp_parameters['inter_trial_delay']
 
         # Load the stim parameters
-        self.grating_sf = self.exp_parameters['grating_sf']
+        self.grating_sfs = self.exp_parameters['grating_sfs']
         self.grating_position = self.exp_parameters['grating_position']
         self.grating_orientations = self.exp_parameters['grating_orientations']
         self.give_blanks = self.exp_parameters['give_blanks']
-        self.grating_phase_temporal_frequency = self.exp_parameters['grating_phase_temporal_frequency']
-        self.grating_phases_range = self.exp_parameters['grating_phases_range']
-        self.grating_size = self.exp_parameters['grating_size']
+        #self.grating_phase_temporal_frequency = self.exp_parameters['grating_phase_temporal_frequency']
+        self.grating_phases = self.exp_parameters['grating_phases']
+        self.grating_sizes = self.exp_parameters['grating_sizes']
         self.grating_mask = self.exp_parameters['grating_mask']
 
         # generate the stimuli, all orientations (+ blanks) will be shown same number of times but randomized
@@ -35,8 +36,8 @@ class SimpleOrientationExperiment(BaseExperiment):
         self.generate_stimuli()
 
         # ps stands for psychopy... 
-        self.ps_grating = psychopy.visual.GratingStim(win=self.window, units="deg", pos=self.grating_position, sf=self.grating_sf,
-                                                       size=self.grating_size, mask=self.grating_mask)
+        self.ps_grating = psychopy.visual.GratingStim(win=self.window, units="deg", pos=self.grating_position, sf=self.grating_sfs[0],
+                                                       size=[self.grating_sizes[0], self.grating_sizes[0]], mask=self.grating_mask)
 
         # log the experiment parameters
         #self.exp_log.log.create_dataset("exp_parameters", data=self.exp_protocol)
@@ -51,14 +52,20 @@ class SimpleOrientationExperiment(BaseExperiment):
         self.exp_log.log['daq_sampling_rate'] = self.daq.sampling_rate
 
     def generate_stimuli(self):
+        all_possible_stims = []
+        for ori in self.grating_orientations:
+            for sf in self.grating_sfs:
+                for size in self.grating_sizes:
+                    for phase in self.grating_phases:
+                        all_possible_stims.append([ori, sf, size, phase])
+
         if self.give_blanks:
-            all_possible_stims = self.grating_orientations
             all_possible_stims.append('blank')
-        else:
-            all_possible_stims = self.grating_orientations
+       
 
         n_stims_per_condition = (self.n_trials//len(all_possible_stims))
         if n_stims_per_condition * len(all_possible_stims) != self.n_trials:
+            print(len(all_possible_stims))
             raise Exception("Please make the number of trials divisible by total possible stims")
 
         self.experiment_stims = all_possible_stims * (self.n_trials//len(all_possible_stims))
@@ -70,7 +77,6 @@ class SimpleOrientationExperiment(BaseExperiment):
 
 
     def run_experiment(self, ):
-        print("trying to run")
         self.experiment_running = True
         bool_logged_start = False
         bool_logged_end = False
@@ -92,12 +98,19 @@ class SimpleOrientationExperiment(BaseExperiment):
 
         for trial in range(self.n_trials):
             print("Trial {} out of {}.".format(trial+1, self.n_trials))
-            current_orientation = self.experiment_stims[trial]
+            current_orientation = self.experiment_stims[trial][0]
+            current_sf = self.experiment_stims[trial][1]
+            current_size = self.experiment_stims[trial][2]
+            current_phase = self.experiment_stims[trial][3]
+
             #current_phase = np.random.randint(self.grating_phases_range[0], self.grating_phases_range[1])
 
-            if current_orientation != 'blank':
+            if self.experiment_stims[trial] != 'blank':
                 self.ps_grating.ori = current_orientation
-            self.ps_grating.phase = 0
+                self.ps_grating.sf = current_sf
+                self.ps_grating.size = current_size
+                #self.ps_grating.phase = current_phase
+            #self.ps_grating.phase = 0
 
 
             total_time = 0
@@ -106,14 +119,18 @@ class SimpleOrientationExperiment(BaseExperiment):
             self.photodiode_square.fillColor = self.photodiode_square.lineColor = self.square_color_on
             # Log stimulus
             # TODO figure out how to dump all the PS grating information easily....
-            self.exp_log.log_stimulus(self.master_clock.getTime(), trial, current_orientation, 0)
+            self.exp_log.log_stimulus(self.master_clock.getTime(), trial, [current_orientation, current_sf, current_size, current_phase], 0)
             while self.clock.getTime() < self.stim_length:
 
                 # temporal frequency change
-                self.ps_grating.phase = np.mod(self.clock.getTime(), 1)
+                if self.clock.getTime() < self.stim_length/2:
+                    self.ps_grating.phase = 0
+                else:
+                    self.ps_grating.phase = 0.5
+                #self.ps_grating.phase = np.mod(self.clock.getTime(), 1)
 
                 # log stim ON
-                if current_orientation != 'blank':
+                if self.experiment_stims[trial] != 'blank':
                     self.ps_grating.draw()
                 self.photodiode_square.draw()
 

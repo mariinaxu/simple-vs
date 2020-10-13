@@ -1,0 +1,32 @@
+#Experiment config file
+# Basic file for parameters of the experiment
+# All delays in seconds
+name: "DynamicBatteryTuning"
+
+n_trials: 970
+
+# the delay before starting and after ending the experiment (black square comes on at half of this time)
+experiment_delay: 2
+# stim on length
+stim_length: 0.4
+
+# stim off length (iti)
+inter_trial_delay: 1.0
+
+#Parameters of visual stimuli
+
+# As per our original rationale:
+# spatial frequency, orientation, stimulus size, 2 phases
+grating_sfs: [0.02, 0.05, 0.2, 0.5]
+grating_position: [0, 0]
+grating_orientations: [0, 45, 90, 135]
+grating_phases: [0, 0.5]
+give_blanks: True
+#grating_phase_temporal_frequency: 1 # in Hz
+
+# assumes sizes equal along x and y axes. 
+grating_sizes: [10, 20, 40, 60]
+grating_mask: 'raisedCos'
+
+
+trial_params_columns: ["trial_number", "clock_time", "orientation", "sf", "size", "stim_info_str"]
