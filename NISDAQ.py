@@ -15,7 +15,7 @@ class NISDAQ:
         self.experiment_id = experiment_id
 
         # TODO make it a yaml settings
-        self.ip_address_list = ["172.17.150.226", "172.17.150.67"]
+        self.ip_address_list = ["172.17.150.226", "172.17.150.220"]
         if platform == "win32":
             self.port = 1001
         else:
@@ -43,7 +43,7 @@ class NISDAQ:
     # TODO make the channels into a settings file somehow...
     def create_NI_tasks(self):
         self.ai_log_task = ni.Task()
-        self.ai_log_task.ai_channels.add_ai_voltage_chan("Dev1/ai0:7")
+        self.ai_log_task.ai_channels.add_ai_voltage_chan("Dev1/ai0:9")
         #self.ai_log_task.ci_channels.add_ci_xx() #TODO
         self.ai_log_task.timing.cfg_samp_clk_timing(rate=self.sampling_rate, sample_mode=ni.constants.AcquisitionType.CONTINUOUS)
         self.ai_log_task.register_every_n_samples_acquired_into_buffer_event(self.sampling_rate, self.data_read_callback)

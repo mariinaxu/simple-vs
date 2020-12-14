@@ -15,7 +15,7 @@ class PCODAQ:
         self.experiment_id = experiment_id
 
         # TODO make it a yaml settings
-        self.ip_address_list = ["172.17.150.209"]
+        self.ip_address_list = ["172.17.150.209", "172.17.150.224"]
         if platform == "win32":
             self.port = 1001
         else:
