@@ -4,18 +4,18 @@
 name: "TextureExperimentFB"
 
 # array containing all the images to display, must have shape (n_images, im_y, im_x)
-#images_filename: "/home/k1n4s3/LABSERVER6/Personal/Federico/TextureProject/fb_stimuli_200528_v0.1.0.npy"
-images_filename: "//NCB-LABSERVER6/data/Personal/Federico/TextureProject/fb_stimuli_200616.npy"
+images_filename: "/home/k1n4s3/LABSERVER6/Personal/Federico/TextureProject/fb_stimuli_200616.npy"
+#images_filename: "//NCB-LABSERVER6/data/Personal/Federico/TextureProject/fb_stimuli_200616.npy"
 
 # the file that contains where each image comes from, type, family, subfamily, full name, indexing must be identical to images_filename
-#images_properties_filename: "/home/k1n4s3/LABSERVER6/Personal/Federico/TextureProject/my_picked_image_properties.h5"
-images_properties_filename: "//NCB-LABSERVER6/data/Personal/Federico/TextureProject/fb_stim-props_200616.h5"
+images_properties_filename: "/home/k1n4s3/LABSERVER6/Personal/Federico/TextureProject/fb_stim-props_200616.h5"
+#images_properties_filename: "//NCB-LABSERVER6/data/Personal/Federico/TextureProject/fb_stim-props_200616.h5"
 
 #in addition, the first half of the images array must be of one type and the second half of the other type. 
 
 # Custom vignette
-#vignette_filename: "/home/k1n4s3/LABSERVER6/Personal/Federico/TextureProject/vignette.npy"
-vignette_filename: "//NCB-LABSERVER6/data/Personal/Federico/TextureProject/vignette.npy"
+vignette_filename: "/home/k1n4s3/LABSERVER6/Personal/Federico/TextureProject/vignette.npy"
+#vignette_filename: "//NCB-LABSERVER6/data/Personal/Federico/TextureProject/vignette.npy"
 
 
 chosen_stim_types: ['texture', 'low-complexity']
@@ -26,22 +26,22 @@ give_blanks: True
 
 # of texture and blanks how many images of each to display?
 # we will show the same 
-n_stims_per_condition: 4 # currently 2 * (20*6*3) = 2 * (20src 6fam 2stim) + 20*2 (blanks)  = 720 images 
+n_stims_per_condition: 1 # currently 2 * (20*6*3) = 2 * (20src 6fam 2stim) + 20*2 (blanks)  = 720 images 
 
 
 
 # the delay before starting and after ending the experiment (black square comes on at half of this time)
-experiment_delay: 8
+experiment_delay: 4
 image_repeat_times: 1 # n times to repeat image, the last period does not have an image off period and goes into ITI
-image_on_period: 0.5
+image_on_period: 0.05
 image_off_period: 0.0
-inter_trial_delay: 2.0
+inter_trial_delay: 0.02
 
 #Parameters of visual stimuli
 image_position: [0, 0]
-image_size: [80, 80]
-image_mask: None
-image_mask_sd: 0
+image_sizes: [50, 75, 100]
+image_mask: "raisedCos"
+image_mask_sd: None
 
 
 

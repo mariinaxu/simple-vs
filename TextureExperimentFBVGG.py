@@ -33,7 +33,7 @@ class TextureExperimentFBVGG(BaseExperiment):
         self.chosen_stim_types = self.exp_parameters['chosen_stim_types']
         self.chosen_families = self.exp_parameters['chosen_families']
 
-        self.image_size = self.exp_parameters['image_size']
+        self.image_sizes = self.exp_parameters['image_sizes']
         self.image_position = self.exp_parameters['image_position']
         self.image_mask = self.exp_parameters['image_mask']
         self.image_mask_sd = self.exp_parameters['image_mask_sd']
@@ -57,7 +57,7 @@ class TextureExperimentFBVGG(BaseExperiment):
         self.exp_log.log['experiment_stims'] = self.experiment_stims
  
         self.image_stim = psychopy.visual.ImageStim(win=self.window, image=None, units="deg", pos=self.image_position,
-                                                    size=self.image_size, mask=self.image_mask, maskParams={'sd': self.image_mask_sd})
+                                                    size=self.image_sizes[0], mask=self.image_mask, maskParams={'sd': self.image_mask_sd})
 
     def load_images(self):
         print("Loading all images to RAM... ")
@@ -66,10 +66,10 @@ class TextureExperimentFBVGG(BaseExperiment):
         self.images -= 128 # images must be between -1 and 1, where 0 is gray, -1 is black, 1 is white
         self.images /= 128
 
-        print("Loading vignette...")
-        self.vignette = np.load(self.vignette_filename)
-        print(self.vignette.shape)
-        self.images *= self.vignette
+        # print("Loading vignette...")
+        # self.vignette = np.load(self.vignette_filename)
+        # print(self.vignette.shape)
+        # self.images *= self.vignette
 
 
         print("Loading all image properties...", flush=False)
@@ -88,11 +88,11 @@ class TextureExperimentFBVGG(BaseExperiment):
         print("All Done!")
 
 
-    def create_randomization(self):
+    def create_randomization_deprecated(self):
         # First we find out all the possible combinations of stimuli
 
         # repeat all possible stims by n_stims_per_condition
-        self.experiment_stims = np.repeat(np.arange(self.n_images), self.n_stims_per_condition)
+        self.experiment_stims = np.repeat(np.arange(self.n_images), self.n_stims_per_condition*s)
         if self.give_blanks:
             blank_array_size = np.array([-1]*self.n_stim_types_size)
             self.experiment_stims = np.concatenate((self.experiment_stims, blank_array_size))
@@ -103,11 +103,33 @@ class TextureExperimentFBVGG(BaseExperiment):
         self.n_trials = self.experiment_stims.shape[0]
         
         print("Total of trials for experiment: ", self.n_trials)
+
+
+    def create_randomization(self):
+        self.experiment_stims = np.repeat(np.arange(self.n_images), self.n_stims_per_condition)
+        # the line below seems to be a rather strange way to repeat the whole array...
+        # consider a better method...
+        self.experiment_stims = np.asarray(list(self.experiment_stims)*len(self.image_sizes))
+        self.stim_sizes = np.repeat(self.image_sizes, self.n_images*self.n_stims_per_condition)
+
+        if self.give_blanks:
+            blank_array_size = np.array([-1]*self.n_stim_types_size)
+            self.experiment_stims = np.concatenate((self.experiment_stims, blank_array_size))
+            self.stim_sizes = np.concatenate((self.stim_sizes, blank_array_size))
+
+            
+        # shuffle the image indices and the stimuli sizes with the same pattern
+        rng_state = np.random.get_state()
+        np.random.shuffle(self.experiment_stims)
+        np.random.set_state(rng_state)
+        np.random.shuffle(self.stim_sizes)
+
+        self.n_trials = self.experiment_stims.shape[0]
+
+        assert(self.experiment_stims.shape[0] == self.stim_sizes.shape[0])
+        
+        print("Total of trials for experiment: ", self.n_trials)
        
-
-
-
-
 
 
     def run_experiment(self, ):
@@ -137,6 +159,7 @@ class TextureExperimentFBVGG(BaseExperiment):
             if index != -1:
                 properties = self.image_properties.iloc[index]
                 self.image_stim.image = self.images[index]
+                self.image_stim.size = self.stim_sizes[index]
             else:
                 properties = 'blank'
                 
@@ -146,7 +169,7 @@ class TextureExperimentFBVGG(BaseExperiment):
             self.clock.reset()
             self.photodiode_square.fillColor = self.photodiode_square.lineColor = self.square_color_on
             # Log stimulus
-            self.exp_log.log_stimulus(self.master_clock.getTime(), i, index, properties)
+            self.exp_log.log_stimulus(self.master_clock.getTime(), i, [index, self.stim_sizes[index]], properties)
             for j in range(self.image_repeat_times):
                 while self.clock.getTime() < self.image_on_period + total_time:
                     if index != -1:
