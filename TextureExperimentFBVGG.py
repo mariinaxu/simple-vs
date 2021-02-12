@@ -119,10 +119,14 @@ class TextureExperimentFBVGG(BaseExperiment):
 
             
         # shuffle the image indices and the stimuli sizes with the same pattern
-        rng_state = np.random.get_state()
-        np.random.shuffle(self.experiment_stims)
-        np.random.set_state(rng_state)
-        np.random.shuffle(self.stim_sizes)
+        shuffler = np.arange(np.shape(self.experiment_stims)[0])
+        np.random.shuffle(shuffler)
+        #rng_state = np.random.get_state()
+        #np.random.shuffle(self.experiment_stims)
+        #np.random.set_state(rng_state)
+        #np.random.shuffle(self.stim_sizes)
+        self.experiment_stims = self.experiment_stims[shuffler]
+        self.stim_sizes = self.stim_sizes[shuffler]
 
         self.n_trials = self.experiment_stims.shape[0]
 
@@ -159,7 +163,7 @@ class TextureExperimentFBVGG(BaseExperiment):
             if index != -1:
                 properties = self.image_properties.iloc[index]
                 self.image_stim.image = self.images[index]
-                self.image_stim.size = self.stim_sizes[index]
+                self.image_stim.size = self.stim_sizes[i]
             else:
                 properties = 'blank'
                 
@@ -169,7 +173,7 @@ class TextureExperimentFBVGG(BaseExperiment):
             self.clock.reset()
             self.photodiode_square.fillColor = self.photodiode_square.lineColor = self.square_color_on
             # Log stimulus
-            self.exp_log.log_stimulus(self.master_clock.getTime(), i, [index, self.stim_sizes[index]], properties)
+            self.exp_log.log_stimulus(self.master_clock.getTime(), i, [index, self.stim_sizes[i]], properties)
             for j in range(self.image_repeat_times):
                 while self.clock.getTime() < self.image_on_period + total_time:
                     if index != -1:
