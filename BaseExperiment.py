@@ -40,10 +40,13 @@ class BaseExperiment(ABC):
         self.save_dir = None
         self.experiment_log_filename = None
         self.ni_log_filename = None
+        self.data_log_dir = None
         self.create_save_directories(save_settings_config_filename)
 
+        self.experiment_settings_filenames = [monitor_config_filename, save_settings_config_filename, self.exp_parameters_filename]
+
         # experiment trial params logger
-        self.exp_log = ExperimentLogger(self.experiment_log_filename, self.experiment_id, self.mouse_id) 
+        self.exp_log = ExperimentLogger(self.experiment_log_filename, self.experiment_id, self.mouse_id, self.data_log_dir, self.experiment_settings_filenames) 
         self.daq.ni_log_filename = self.ni_log_filename
 
         self.create_photodiode_square()

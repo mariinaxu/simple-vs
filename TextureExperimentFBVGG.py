@@ -57,7 +57,8 @@ class TextureExperimentFBVGG(BaseExperiment):
         self.exp_log.log['experiment_stims'] = self.experiment_stims
  
         self.image_stim = psychopy.visual.ImageStim(win=self.window, image=None, units="deg", pos=self.image_position,
-                                                    size=self.image_sizes[0], mask=self.image_mask, maskParams={'sd': self.image_mask_sd})
+                                                    size=self.image_sizes[0], mask=self.image_mask, maskParams={'sd': self.image_mask_sd},
+                                                    interpolate=True)
 
     def load_images(self):
         print("Loading all images to RAM... ")
