@@ -126,7 +126,6 @@ class DynamicBatteryExperiment(BaseExperiment):
                     self.ps_grating.phase = 0.5
                 #self.ps_grating.phase = np.mod(self.clock.getTime(), 1)
 
-                # log stim ON
                 if self.experiment_stims[trial] != 'blank':
                     self.ps_grating.draw()
                 self.photodiode_square.draw()
