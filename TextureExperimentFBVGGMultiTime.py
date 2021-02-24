@@ -166,7 +166,7 @@ class TextureExperimentFBVGGMultiTime(BaseExperiment):
 
         self.absolute_total_time += self.experiment_delay
 
-        for i in range(10):
+        for i in range(self.n_trials):
             index = self.experiment_stims[i]
             print("Image trial {} out of {}.".format(i+1, self.n_trials))
             if index != -1:
@@ -175,6 +175,7 @@ class TextureExperimentFBVGGMultiTime(BaseExperiment):
                 self.image_stim.size = self.stim_sizes[i]
             else:
                 properties = 'blank'
+                
             self.image_on_period = self.stim_on_times[i]
                 
 

@@ -1,7 +1,7 @@
 #Experiment config file
 # Basic file for parameters of the experiment
 # All delays in seconds
-name: "TextureExperimentFB"
+name: "TextureExperimentFB_MultiTime"
 
 # array containing all the images to display, must have shape (n_images, im_y, im_x)
 images_filename: "/home/k1n4s3/LABSERVER6/Personal/Federico/TextureProject/fb_stimuli_210205.npy"

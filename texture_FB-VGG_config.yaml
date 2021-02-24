@@ -36,11 +36,13 @@ n_stims_per_condition: 5 # currently 2 * (20*6*3) = 2 * (20src 6fam 2stim) + 20*
 # the delay before starting and after ending the experiment (black square comes on at half of this time)
 experiment_delay: 2
 image_repeat_times: 1 # n times to repeat image, the last period does not have an image off period and goes into ITI
-image_on_period: 2.5
+image_on_period: 0.25
 image_off_period: 0.0
-inter_trial_delay: 1.0
+inter_trial_delay: 0.25
 
 #Parameters of visual stimuli
+image_crop_size: -1 # [128, 128] # size to crop to ensure one can use a windowed stimuli while maintaining SF consistent
+# set above parameter to -1 to avoid cropping
 image_position: [0, 0]
 image_sizes: [100]
 image_mask: "raisedCos"

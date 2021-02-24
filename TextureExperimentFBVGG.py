@@ -33,6 +33,7 @@ class TextureExperimentFBVGG(BaseExperiment):
         self.chosen_stim_types = self.exp_parameters['chosen_stim_types']
         self.chosen_families = self.exp_parameters['chosen_families']
 
+        self.image_crop_size = self.exp_parameters['image_crop_size']
         self.image_sizes = self.exp_parameters['image_sizes']
         self.image_position = self.exp_parameters['image_position']
         self.image_mask = self.exp_parameters['image_mask']
@@ -66,6 +67,15 @@ class TextureExperimentFBVGG(BaseExperiment):
         self.n_images = self.images.shape[0]
         self.images -= 128 # images must be between -1 and 1, where 0 is gray, -1 is black, 1 is white
         self.images /= 128
+
+        if self.image_crop_size != -1:
+            center_y = self.images[0].shape[0]//2
+            center_x = self.images[0].shape[1]//2
+            c_x = self.image_crop_size[0]//2
+            c_y = self.image_crop_size[1]//2
+
+            self.images = self.images[:, center_y-c_y:center_y+c_y, center_x-c_x:center_x+c_x]
+        print("Shape of image tensor", self.images.shape)
 
         # print("Loading vignette...")
         # self.vignette = np.load(self.vignette_filename)
