@@ -8,7 +8,7 @@ n_trials: 650
 # the delay before starting and after ending the experiment (black square comes on at half of this time)
 experiment_delay: 8
 # stim on length
-stim_length: 0.25
+stim_length: 0.5
 
 # stim off length (iti)
 inter_trial_delay: 1.0

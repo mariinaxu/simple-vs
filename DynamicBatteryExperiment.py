@@ -120,11 +120,13 @@ class DynamicBatteryExperiment(BaseExperiment):
             while self.clock.getTime() < self.stim_length:
 
                 # temporal frequency change
-                if self.clock.getTime() < self.stim_length/2:
-                    self.ps_grating.phase = 0
-                else:
-                    self.ps_grating.phase = 0.5
+                # if self.clock.getTime() < self.stim_length/2:
+                #     self.ps_grating.contrast = 1
+                # else:
+                #     self.ps_grating.contrast = -1
                 #self.ps_grating.phase = np.mod(self.clock.getTime(), 1)
+
+                self.ps_grating.contrast = 1 - (1/(self.stim_length/2))*np.mod(self.clock.getTime(), self.stim_length)
 
                 if self.experiment_stims[trial] != 'blank':
                     self.ps_grating.draw()
