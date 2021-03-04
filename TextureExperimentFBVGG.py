@@ -21,7 +21,7 @@ class TextureExperimentFBVGG(BaseExperiment):
         self.experiment_delay = self.exp_parameters['experiment_delay']
 
         self.give_blanks = self.exp_parameters['give_blanks']
-        self.n_stims_per_condition = self.exp_parameters['n_stims_per_condition']
+        self.n_stim_repeats = self.exp_parameters['n_stim_repeats']
         
         self.experiment_delay = self.exp_parameters['experiment_delay']
         self.image_repeat_times = self.exp_parameters['image_repeat_times']
@@ -31,9 +31,9 @@ class TextureExperimentFBVGG(BaseExperiment):
 
 
         self.chosen_stim_types = self.exp_parameters['chosen_stim_types']
-        self.chosen_families = self.exp_parameters['chosen_families']
 
         self.image_crop_size = self.exp_parameters['image_crop_size']
+        self.image_rotations = self.exp_parameters['image_rotations']
         self.image_sizes = self.exp_parameters['image_sizes']
         self.image_position = self.exp_parameters['image_position']
         self.image_mask = self.exp_parameters['image_mask']
@@ -93,52 +93,44 @@ class TextureExperimentFBVGG(BaseExperiment):
                 # self.image_properties.iloc[np.where(self.image_properties['stim_type'] == 'low-complexity')[0]].count()).all()
                 
         # chosen families is only for texture stimuli. As LC stimuli have less examples due to being redundant
-        self.n_stim_types_size = (np.where(self.image_properties['stim_type'] == 'texture')[0].shape[0]//len(self.chosen_families))*self.n_stims_per_condition
-        #self.n_stim_types_size = (np.where(self.image_properties['stim_type'] == 'low-complexity')[0].shape[0]//len(self.chosen_families))*self.n_stims_per_condition
-
+        self.n_stim_per_family = (np.where(self.image_properties['stim_type'] == self.chosen_stim_types[0])[0].shape[0]//len(self.image_properties['family'].unique()))
         print("All Done!")
 
 
-    def create_randomization_deprecated(self):
-        # First we find out all the possible combinations of stimuli
-
-        # repeat all possible stims by n_stims_per_condition
-        self.experiment_stims = np.repeat(np.arange(self.n_images), self.n_stims_per_condition*s)
-        if self.give_blanks:
-            blank_array_size = np.array([-1]*self.n_stim_types_size)
-            self.experiment_stims = np.concatenate((self.experiment_stims, blank_array_size))
-
-        np.random.shuffle(self.experiment_stims)
-        
-		
-        self.n_trials = self.experiment_stims.shape[0]
-        
-        print("Total of trials for experiment: ", self.n_trials)
-
 
     def create_randomization(self):
-        self.experiment_stims = np.repeat(np.arange(self.n_images), self.n_stims_per_condition)
+        self.experiment_stims = np.repeat(np.arange(self.n_images), self.n_stim_repeats)
         # the line below seems to be a rather strange way to repeat the whole array...
         # consider a better method...
+
+        # multiply experiment stimuli by total number of stim sizes
         self.experiment_stims = np.asarray(list(self.experiment_stims)*len(self.image_sizes))
-        self.stim_sizes = np.repeat(self.image_sizes, self.n_images*self.n_stims_per_condition)
+        self.stim_sizes = np.repeat(self.image_sizes, self.n_images*self.n_stim_repeats*len(self.image_rotations))
+
+        # multiply experiment stimuli by total number of rotations
+        self.experiment_stims = np.asarray(list(self.experiment_stims)*len(self.image_rotations))
+        self.stim_rotations = np.repeat(self.image_rotations, self.n_images*self.n_stim_repeats*len(self.image_sizes))
+
+
+
 
         if self.give_blanks:
-            blank_array_size = np.array([-1]*self.n_stim_types_size)
+            blank_array_size = np.array([-1]*self.n_stim_repeats*self.n_stim_per_family)
             self.experiment_stims = np.concatenate((self.experiment_stims, blank_array_size))
             self.stim_sizes = np.concatenate((self.stim_sizes, blank_array_size))
+            self.stim_rotations = np.concatenate((self.stim_rotations, blank_array_size))\
+
+        assert(len(self.experiment_stims) == len(self.stim_sizes))
+        assert(len(self.experiment_stims) == len(self.stim_rotations))
 
             
         # shuffle the image indices and the stimuli sizes with the same pattern
         shuffler = np.arange(np.shape(self.experiment_stims)[0])
         np.random.shuffle(shuffler)
-        #rng_state = np.random.get_state()
-        #np.random.shuffle(self.experiment_stims)
-        #np.random.set_state(rng_state)
-        #np.random.shuffle(self.stim_sizes)
+
         self.experiment_stims = self.experiment_stims[shuffler]
         self.stim_sizes = self.stim_sizes[shuffler]
-
+        self.stim_rotations = self.stim_rotations[shuffler]
         self.n_trials = self.experiment_stims.shape[0]
 
         assert(self.experiment_stims.shape[0] == self.stim_sizes.shape[0])
@@ -175,6 +167,7 @@ class TextureExperimentFBVGG(BaseExperiment):
                 properties = self.image_properties.iloc[index]
                 self.image_stim.image = self.images[index]
                 self.image_stim.size = self.stim_sizes[i]
+                self.image_stim.ori = self.stim_rotations[i]
             else:
                 properties = 'blank'
                 
@@ -184,7 +177,7 @@ class TextureExperimentFBVGG(BaseExperiment):
             self.clock.reset()
             self.photodiode_square.fillColor = self.photodiode_square.lineColor = self.square_color_on
             # Log stimulus
-            self.exp_log.log_stimulus(self.master_clock.getTime(), i, [index, self.stim_sizes[i]], properties)
+            self.exp_log.log_stimulus(self.master_clock.getTime(), i, [index, self.stim_sizes[i], self.stim_rotations[i]], properties)
             for j in range(self.image_repeat_times):
                 while self.clock.getTime() < self.image_on_period + total_time:
                     if index != -1:
