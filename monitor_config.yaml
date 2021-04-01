@@ -6,7 +6,8 @@ monitor_height_pixels: 1080
 monitor_width_cm: 52.2
 screen_id: 0
 viewing_distance_cm: 30
-monitor_gamma: 1
+monitor_gamma: None
+monitor_gamma_lut: '/home/k1n4s3/LABSERVER6/Personal/Federico/GitRepos/monitor-calibrations/IIYAMA_Prolite_LE4041UHS.npy'
 
 
 # TODO need to add square settings
@@ -19,3 +20,4 @@ square_position: [-960 , -540] # find a nicer way to specify, but this is basica
 # color units are 0->1 (1 is max white)
 square_color_off: [-1]
 square_color_on: [1]
+

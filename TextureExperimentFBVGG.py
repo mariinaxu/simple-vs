@@ -171,7 +171,9 @@ class TextureExperimentFBVGG(BaseExperiment):
             else:
                 properties = 'blank'
                 
-
+            if self.debug:
+                print(self.image_stim.size, self.image_stim.ori, properties)
+            
 
             total_time = 0
             self.clock.reset()

@@ -8,6 +8,7 @@ import yaml
 from sys import platform
 import os
 from time import sleep
+import numpy as np
 
 class BaseExperiment(ABC):
     def __init__(self, experiment_id, mouse_id, daq, monitor_config_filename, save_settings_config_filename, exp_config_filename, debug):
@@ -82,6 +83,8 @@ class BaseExperiment(ABC):
         #self.monitor.save()
 
     def load_window(self):
+        monitor_gamma_lut = np.load(self.monitor_settings['monitor_gamma_lut'])
+
         self.window = psychopy.visual.Window(monitor=self.monitor, 
                                             size=(self.monitor_settings['monitor_width_pixels'],
                                                   self.monitor_settings['monitor_height_pixels']),
@@ -92,6 +95,7 @@ class BaseExperiment(ABC):
                                             allowGUI=False,
                                             fullscr=False,
                                             waitBlanking=True)
+        self.window.gammaRamp(monitor_gamma_lut)
 
 
     def create_photodiode_square(self):
