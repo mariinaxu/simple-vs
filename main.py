@@ -13,7 +13,9 @@ from PCODAQ import PCODAQ
 from SimpleOrientationExperiment import SimpleOrientationExperiment
 from TextureExperimentFB import TextureExperimentFB
 from TextureExperimentFBVGG import TextureExperimentFBVGG
+from TextureExperimentFBVGGMultiTime import TextureExperimentFBVGGMultiTime
 from DynamicBatteryExperiment import  DynamicBatteryExperiment
+from SquareExperiment import SquareExperiment
 
 bool_DEBUG = True
 
@@ -40,7 +42,10 @@ if __name__ == "__main__":
         #data_aq = PCODAQ(experiment_id)
         exp = DynamicBatteryExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "dynamic_battery_config.yaml", debug=bool_DEBUG)
         #exp = SimpleOrientationExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "simple_orientation_config.yaml", debug=bool_DEBUG)
+        
         #exp = TextureExperimentFBVGG(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "texture_FB-VGG_config.yaml", debug=bool_DEBUG)
+        #exp = TextureExperimentFBVGGMultiTime(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "texture_FB-VGGMultiTime_config.yaml", debug=bool_DEBUG)
+        #exp = SquareExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "square_config.yaml", debug=bool_DEBUG)
 
         exp.load_experiment_config()
         exp.start_data_acquisition()

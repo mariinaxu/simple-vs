@@ -99,6 +99,7 @@ class DynamicBatteryExperiment(BaseExperiment):
             current_orientation = self.experiment_stims[trial][0]
             current_sf = self.experiment_stims[trial][1]
             current_size = self.experiment_stims[trial][2]
+            current_phase = np.round(np.random.random(), 2)
 
             #current_phase = np.random.randint(self.grating_phases_range[0], self.grating_phases_range[1])
 
@@ -106,6 +107,7 @@ class DynamicBatteryExperiment(BaseExperiment):
                 self.ps_grating.ori = current_orientation
                 self.ps_grating.sf = current_sf
                 self.ps_grating.size = current_size
+                self.ps_grating.phase = current_phase#np.round(np.random.random(), 2)
                 
             
 
@@ -116,17 +118,18 @@ class DynamicBatteryExperiment(BaseExperiment):
             self.photodiode_square.fillColor = self.photodiode_square.lineColor = self.square_color_on
             # Log stimulus
             # TODO figure out how to dump all the PS grating information easily....
-            self.exp_log.log_stimulus(self.master_clock.getTime(), trial, [current_orientation, current_sf, current_size], 0)
+            self.exp_log.log_stimulus(self.master_clock.getTime(), trial, [current_orientation, current_sf, current_size, current_phase], 0)
             while self.clock.getTime() < self.stim_length:
 
                 # temporal frequency change
-                if self.clock.getTime() < self.stim_length/2:
-                    self.ps_grating.phase = 0
-                else:
-                    self.ps_grating.phase = 0.5
+                # if self.clock.getTime() < self.stim_length/2:
+                #     self.ps_grating.contrast = 1
+                # else:
+                #     self.ps_grating.contrast = -1
                 #self.ps_grating.phase = np.mod(self.clock.getTime(), 1)
 
-                # log stim ON
+                #self.ps_grating.contrast = 1 - (1/(self.stim_length/2))*np.mod(self.clock.getTime(), self.stim_length)
+
                 if self.experiment_stims[trial] != 'blank':
                     self.ps_grating.draw()
                 self.photodiode_square.draw()

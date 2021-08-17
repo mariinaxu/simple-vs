@@ -8,6 +8,7 @@ import yaml
 from sys import platform
 import os
 from time import sleep
+import numpy as np
 
 class BaseExperiment(ABC):
     def __init__(self, experiment_id, mouse_id, daq, monitor_config_filename, save_settings_config_filename, exp_config_filename, debug):
@@ -40,10 +41,13 @@ class BaseExperiment(ABC):
         self.save_dir = None
         self.experiment_log_filename = None
         self.ni_log_filename = None
+        self.data_log_dir = None
         self.create_save_directories(save_settings_config_filename)
 
+        self.experiment_settings_filenames = [monitor_config_filename, save_settings_config_filename, self.exp_parameters_filename]
+
         # experiment trial params logger
-        self.exp_log = ExperimentLogger(self.experiment_log_filename, self.experiment_id, self.mouse_id) 
+        self.exp_log = ExperimentLogger(self.experiment_log_filename, self.experiment_id, self.mouse_id, self.data_log_dir, self.experiment_settings_filenames) 
         self.daq.ni_log_filename = self.ni_log_filename
 
         self.create_photodiode_square()
@@ -68,27 +72,44 @@ class BaseExperiment(ABC):
         monitor_width_cm = self.monitor_settings['monitor_width_cm']
         viewing_distance_cm = self.monitor_settings['viewing_distance_cm']
         monitor_gamma = self.monitor_settings['monitor_gamma']
+        
+        
+        self.gamma = self.monitor_settings['monitor_gamma']
+ 
 
-
-
-        self.monitor = psychopy.monitors.Monitor(monitor_name, width=monitor_width_cm, distance=viewing_distance_cm, gamma=monitor_gamma)
+        self.monitor = psychopy.monitors.Monitor(monitor_name, width=monitor_width_cm, distance=viewing_distance_cm, gamma=1)
         self.monitor.setSizePix((monitor_width_pixels, monitor_height_pixels))
 
         
         # TODO  check if monitor needs to get saved in win
         #self.monitor.save()
+        
+    def linearize_image(self, im):
+        #return (self.a + self.k*im)**self.gamma
+        ## im must be between 0 and 1
+        return im**(1/self.gamma)
 
     def load_window(self):
+        #monitor_gamma_lut = np.load(self.monitor_settings['monitor_gamma_lut'])
+        
+        # true half max luminance
+        gray = 255*(0.5 ** (1/self.gamma))
+        gray -= 128
+        gray /= 128
+        
+        print("linearized gray applied!")
+
         self.window = psychopy.visual.Window(monitor=self.monitor, 
                                             size=(self.monitor_settings['monitor_width_pixels'],
                                                   self.monitor_settings['monitor_height_pixels']),
-                                            color='gray',
+                                            color=gray,
                                             colorSpace='rgb',
                                             units='deg',
                                             screen=self.monitor_settings['screen_id'],
                                             allowGUI=False,
                                             fullscr=False,
                                             waitBlanking=True)
+        #self.window.gammaRamp = monitor_gamma_lut
 
 
     def create_photodiode_square(self):

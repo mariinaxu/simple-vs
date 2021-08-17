@@ -3,9 +3,13 @@ from time import time
 import h5py
 import numpy as np
 import pickle
+import yaml
+import shutil
+import os
+
 
 class ExperimentLogger():
-    def __init__(self, filename, experiment_id, mouse_id):
+    def __init__(self, filename, experiment_id, mouse_id, log_dir, experiment_settings_filenames):
         self.filename = filename
         self.log = {}
 
@@ -24,6 +28,12 @@ class ExperimentLogger():
 
         self.trial_params = []
         self.trial_params_columns = None
+
+        # for each of the settings filenames we make a copy of them to always have them available.
+        for filename in experiment_settings_filenames:
+            new_filename = os.path.join(log_dir, filename.split("/")[-1])
+            shutil.copyfile(filename, new_filename)
+        print("Copied experiment settings.")
 
 
 

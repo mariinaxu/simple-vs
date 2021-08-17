@@ -7,7 +7,8 @@ import numpy as np
 import yaml
 import pandas as pd
 
-class TextureExperimentFBVGG(BaseExperiment):
+# very similar to TextureExperimentFBVGG however in this one we add the parameterization of the stimulus on time.
+class TextureExperimentFBVGGMultiTime(BaseExperiment):
     def load_experiment_config(self, ):
         with open (self.exp_parameters_filename, 'r') as file:
             self.exp_parameters = yaml.load(file, Loader=yaml.FullLoader)
@@ -21,19 +22,21 @@ class TextureExperimentFBVGG(BaseExperiment):
         self.experiment_delay = self.exp_parameters['experiment_delay']
 
         self.give_blanks = self.exp_parameters['give_blanks']
-        self.n_stim_repeats = self.exp_parameters['n_stim_repeats']
+        self.n_stims_per_condition = self.exp_parameters['n_stims_per_condition']
         
         self.experiment_delay = self.exp_parameters['experiment_delay']
         self.image_repeat_times = self.exp_parameters['image_repeat_times']
-        self.image_on_period = self.exp_parameters['image_on_period']
+        self.image_on_periods = self.exp_parameters['image_on_periods']
         self.image_off_period = self.exp_parameters['image_off_period']
         self.inter_trial_delay = self.exp_parameters['inter_trial_delay']
 
+        # Will get updated per trial
+        self.image_on_period = None
+
 
         self.chosen_stim_types = self.exp_parameters['chosen_stim_types']
+        self.chosen_families = self.exp_parameters['chosen_families']
 
-        self.image_crop_size = self.exp_parameters['image_crop_size']
-        self.image_rotations = self.exp_parameters['image_rotations']
         self.image_sizes = self.exp_parameters['image_sizes']
         self.image_position = self.exp_parameters['image_position']
         self.image_mask = self.exp_parameters['image_mask']
@@ -63,25 +66,10 @@ class TextureExperimentFBVGG(BaseExperiment):
 
     def load_images(self):
         print("Loading all images to RAM... ")
-        self.images = np.load(self.images_filename).astype(np.float32) / 255
+        self.images = np.load(self.images_filename).astype(np.float32)
         self.n_images = self.images.shape[0]
-        
-        for i in range(self.n_images):
-            self.images[i] = self.linearize_image(self.images[i])
-
-        print("Images linearized!")
-        self.images *= 255
         self.images -= 128 # images must be between -1 and 1, where 0 is gray, -1 is black, 1 is white
         self.images /= 128
-
-        if self.image_crop_size != -1:
-            center_y = self.images[0].shape[0]//2
-            center_x = self.images[0].shape[1]//2
-            c_x = self.image_crop_size[0]//2
-            c_y = self.image_crop_size[1]//2
-
-            self.images = self.images[:, center_y-c_y:center_y+c_y, center_x-c_x:center_x+c_x]
-        print("Shape of image tensor", self.images.shape)
 
         # print("Loading vignette...")
         # self.vignette = np.load(self.vignette_filename)
@@ -98,36 +86,31 @@ class TextureExperimentFBVGG(BaseExperiment):
         # assert (self.image_properties.iloc[np.where(self.image_properties['stim_type'] == 'texture')[0]].count() == 
                 # self.image_properties.iloc[np.where(self.image_properties['stim_type'] == 'low-complexity')[0]].count()).all()
                 
+        # TODO recalculation of number of blanks
         # chosen families is only for texture stimuli. As LC stimuli have less examples due to being redundant
-        self.n_stim_per_family = (np.where(self.image_properties['stim_type'] == self.chosen_stim_types[0])[0].shape[0]//len(self.image_properties['family'].unique()))
+        #self.n_stim_types_size = (np.where(self.image_properties['stim_type'] == 'texture')[0].shape[0]//len(self.chosen_families))*self.n_stims_per_condition
+        #self.n_stim_types_size = (np.where(self.image_properties['stim_type'] == 'low-complexity')[0].shape[0]//len(self.chosen_families))*self.n_stims_per_condition
+
         print("All Done!")
 
 
 
     def create_randomization(self):
-        self.experiment_stims = np.repeat(np.arange(self.n_images), self.n_stim_repeats)
+        self.experiment_stims = np.repeat(np.arange(self.n_images), self.n_stims_per_condition)
         # the line below seems to be a rather strange way to repeat the whole array...
         # consider a better method...
-
-        # multiply experiment stimuli by total number of stim sizes
-        self.experiment_stims = np.asarray(list(self.experiment_stims)*len(self.image_sizes))
-        self.stim_sizes = np.repeat(self.image_sizes, self.n_images*self.n_stim_repeats*len(self.image_rotations))
-
-        # multiply experiment stimuli by total number of rotations
-        self.experiment_stims = np.asarray(list(self.experiment_stims)*len(self.image_rotations))
-        self.stim_rotations = np.repeat(self.image_rotations, self.n_images*self.n_stim_repeats*len(self.image_sizes))
-
-
-
+        self.experiment_stims = np.asarray(list(self.experiment_stims)*len(self.image_sizes)*len(self.image_on_periods))
+        self.stim_sizes = np.repeat(self.image_sizes, self.n_images*self.n_stims_per_condition*len(self.image_on_periods))
+        self.stim_on_times = np.repeat(self.image_on_periods, self.n_images*self.n_stims_per_condition*len(self.image_sizes))
 
         if self.give_blanks:
-            blank_array_size = np.array([-1]*self.n_stim_repeats*self.n_stim_per_family)
-            self.experiment_stims = np.concatenate((self.experiment_stims, blank_array_size))
-            self.stim_sizes = np.concatenate((self.stim_sizes, blank_array_size))
-            self.stim_rotations = np.concatenate((self.stim_rotations, blank_array_size))\
-
-        assert(len(self.experiment_stims) == len(self.stim_sizes))
-        assert(len(self.experiment_stims) == len(self.stim_rotations))
+            raise(NotImplementedError("Blanks must be fixed first"))
+            #blank_array_size = np.array([-1]*self.n_stim_types_size)
+            #blank_on_times    = np.array([self.image_on_periods[0]]*self.n_stim_types_size)
+            #self.experiment_stims = np.concatenate((self.experiment_stims, blank_array_size))
+            #self.stim_sizes = np.concatenate((self.stim_sizes, blank_array_size))
+            # stim on of blank will be the first element in the image_on_periods array
+            #self.stim_on_times = np.concatenate((self.stim_on_times, blank_on_times))
 
             
         # shuffle the image indices and the stimuli sizes with the same pattern
@@ -136,13 +119,30 @@ class TextureExperimentFBVGG(BaseExperiment):
 
         self.experiment_stims = self.experiment_stims[shuffler]
         self.stim_sizes = self.stim_sizes[shuffler]
-        self.stim_rotations = self.stim_rotations[shuffler]
+        self.stim_on_times = self.stim_on_times[shuffler]
+
         self.n_trials = self.experiment_stims.shape[0]
 
         assert(self.experiment_stims.shape[0] == self.stim_sizes.shape[0])
-        
+        assert(self.experiment_stims.shape[0] == self.stim_on_times.shape[0])
         print("Total of trials for experiment: ", self.n_trials)
+
+        self.verify_stimuli_generation()
        
+    def verify_stimuli_generation(self):
+        # check that number of stimuli match all the sizes, periods and repeat of images
+        unique_image_indices = np.unique(self.experiment_stims)
+        for unique_index in unique_image_indices:
+            assert((self.experiment_stims == unique_index).sum() == self.n_stims_per_condition*len(self.image_sizes)*len(self.image_on_periods))
+
+        unique_stim_sizes = np.unique(self.stim_sizes)
+        for unique_size in unique_stim_sizes:
+            assert((self.stim_sizes == unique_size).sum() == self.n_images*self.n_stims_per_condition*len(self.image_on_periods))
+
+        unique_stim_times = np.unique(self.stim_on_times)
+        for unique_stim_time in unique_stim_times:
+            assert((self.stim_on_times == unique_stim_time).sum() == self.n_images*self.n_stims_per_condition*len(self.image_sizes))
+        return True
 
 
     def run_experiment(self, ):
@@ -173,19 +173,18 @@ class TextureExperimentFBVGG(BaseExperiment):
                 properties = self.image_properties.iloc[index]
                 self.image_stim.image = self.images[index]
                 self.image_stim.size = self.stim_sizes[i]
-                self.image_stim.ori = self.stim_rotations[i]
             else:
                 properties = 'blank'
                 
-            if self.debug:
-                print(self.image_stim.size, self.image_stim.ori, properties)
-            
+            self.image_on_period = self.stim_on_times[i]
+                
+
 
             total_time = 0
             self.clock.reset()
             self.photodiode_square.fillColor = self.photodiode_square.lineColor = self.square_color_on
             # Log stimulus
-            self.exp_log.log_stimulus(self.master_clock.getTime(), i, [index, self.stim_sizes[i], self.stim_rotations[i]], properties)
+            self.exp_log.log_stimulus(self.master_clock.getTime(), i, [index, self.stim_sizes[i], self.image_on_period], properties)
             for j in range(self.image_repeat_times):
                 while self.clock.getTime() < self.image_on_period + total_time:
                     if index != -1:

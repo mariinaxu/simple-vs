@@ -44,8 +44,10 @@ class NISDAQ:
     def create_NI_tasks(self):
         self.ai_log_task = ni.Task()
         self.ai_log_task.ai_channels.add_ai_voltage_chan("Dev1/ai0:9")
+        self.ai_log_task.ai_channels.add_ai_voltage_chan("Dev1/ai18")
+        self.ai_log_task.ai_channels.add_ai_voltage_chan("Dev1/ai19")
         #self.ai_log_task.ci_channels.add_ci_xx() #TODO
-        self.ai_log_task.timing.cfg_samp_clk_timing(rate=self.sampling_rate, sample_mode=ni.constants.AcquisitionType.CONTINUOUS)
+        self.ai_log_task.timing.cfg_samp_clk_timing(rate=self.sampling_rate, sample_mode=ni.constants.AcquisitionType.CONTINUOUS, samps_per_chan=5000000)
         self.ai_log_task.register_every_n_samples_acquired_into_buffer_event(self.sampling_rate, self.data_read_callback)
 
         self.out_ttl_task = ni.Task()
