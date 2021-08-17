@@ -15,7 +15,7 @@ from TextureExperimentFB import TextureExperimentFB
 from TextureExperimentFBVGG import TextureExperimentFBVGG
 from DynamicBatteryExperiment import  DynamicBatteryExperiment
 
-bool_DEBUG = False
+bool_DEBUG = True
 
 def create_experiment_name():
     if not bool_DEBUG:
