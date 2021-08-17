@@ -63,8 +63,14 @@ class TextureExperimentFBVGG(BaseExperiment):
 
     def load_images(self):
         print("Loading all images to RAM... ")
-        self.images = np.load(self.images_filename).astype(np.float32)
+        self.images = np.load(self.images_filename).astype(np.float32) / 255
         self.n_images = self.images.shape[0]
+        
+        for i in range(self.n_images):
+            self.images[i] = self.linearize_image(self.images[i])
+
+        print("Images linearized!")
+        self.images *= 255
         self.images -= 128 # images must be between -1 and 1, where 0 is gray, -1 is black, 1 is white
         self.images /= 128
 

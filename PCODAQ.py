@@ -50,7 +50,8 @@ class PCODAQ:
 		
 	
         self.out_ttl_task = ni.Task()
-        self.out_ttl_task.do_channels.add_do_chan("Dev1/port0/line1", line_grouping=ni.constants.LineGrouping.CHAN_FOR_ALL_LINES)
+        self.out_ttl_task.do_channels.add_do_chan("Dev1/port1/line0", line_grouping=ni.constants.LineGrouping.CHAN_FOR_ALL_LINES)
+        
 
 
 
@@ -73,14 +74,14 @@ class PCODAQ:
 
     def start_cameras(self):
         message1 = "ExpStart {} 1 1".format(self.experiment_id)
-        message2 = "BlockStart {} 1 1 1".format(self.experiment_id)
+        message2 = "StimStart {} 1 1 1".format(self.experiment_id)
 
         self.send_message_to_list(message1)
         self.send_message_to_list(message2)
 
 
     def stop_cameras(self):
-        message1 = "BlockEnd {} 1 1 1".format(self.experiment_id)
+        message1 = "StimEnd {} 1 1 1".format(self.experiment_id)
         message2 = "ExpEnd {} 1 1".format(self.experiment_id)
 
         self.send_message_to_list(message1)
@@ -89,8 +90,9 @@ class PCODAQ:
     def start_everything(self):
         self.start_logging()
         sleep(1)  
-        self.start_pco()
         self.start_cameras()
+        sleep(1)
+        self.start_pco()
         sleep(1)
     
     def stop_everything(self):
@@ -112,6 +114,7 @@ class PCODAQ:
 		
 	# send a high ttl to trigger 2p acquisition
     def start_pco(self):
+        print("TURNED TRUE")
         self.out_ttl_task.write([True])
 		
     def stop_pco(self):
@@ -123,3 +126,25 @@ class PCODAQ:
         
         np.save(filename, self.data)
         print("Saved NI log (size): ", filename, self.data.shape)
+        
+        
+     
+if __name__ == "__main__":
+    data = []
+    data2 = []
+    DEBUG = True
+    
+    out_ttl_task = ni.Task()
+    out_ttl_task.do_channels.add_do_chan("Dev1/port1/line0", line_grouping=ni.constants.LineGrouping.CHAN_FOR_ALL_LINES)
+    
+    try:
+        while True:
+            input("Press enter to make it true")
+            out_ttl_task.write([True])
+            print("Made it True")
+            input("Press enter to make it false")
+            out_ttl_task.write([False])
+            print("Made it false.")
+    except KeyboardInterupt:
+        out_ttl_task.close()
+        print("Properly closed the task")

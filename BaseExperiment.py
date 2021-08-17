@@ -72,30 +72,44 @@ class BaseExperiment(ABC):
         monitor_width_cm = self.monitor_settings['monitor_width_cm']
         viewing_distance_cm = self.monitor_settings['viewing_distance_cm']
         monitor_gamma = self.monitor_settings['monitor_gamma']
+        
+        
+        self.gamma = self.monitor_settings['monitor_gamma']
+ 
 
-
-
-        self.monitor = psychopy.monitors.Monitor(monitor_name, width=monitor_width_cm, distance=viewing_distance_cm, gamma=monitor_gamma)
+        self.monitor = psychopy.monitors.Monitor(monitor_name, width=monitor_width_cm, distance=viewing_distance_cm, gamma=1)
         self.monitor.setSizePix((monitor_width_pixels, monitor_height_pixels))
 
         
         # TODO  check if monitor needs to get saved in win
         #self.monitor.save()
+        
+    def linearize_image(self, im):
+        #return (self.a + self.k*im)**self.gamma
+        ## im must be between 0 and 1
+        return im**(1/self.gamma)
 
     def load_window(self):
-        monitor_gamma_lut = np.load(self.monitor_settings['monitor_gamma_lut'])
+        #monitor_gamma_lut = np.load(self.monitor_settings['monitor_gamma_lut'])
+        
+        # true half max luminance
+        gray = 255*(0.5 ** (1/self.gamma))
+        gray -= 128
+        gray /= 128
+        
+        print("linearized gray applied!")
 
         self.window = psychopy.visual.Window(monitor=self.monitor, 
                                             size=(self.monitor_settings['monitor_width_pixels'],
                                                   self.monitor_settings['monitor_height_pixels']),
-                                            color='gray',
+                                            color=gray,
                                             colorSpace='rgb',
                                             units='deg',
                                             screen=self.monitor_settings['screen_id'],
                                             allowGUI=False,
                                             fullscr=False,
                                             waitBlanking=True)
-        self.window.gammaRamp(monitor_gamma_lut)
+        #self.window.gammaRamp = monitor_gamma_lut
 
 
     def create_photodiode_square(self):

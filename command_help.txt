@@ -1,0 +1,6 @@
+
+# 2photon setup
+X:\Personal\Federico\GitRepos\simple-vs\main.py
+
+# WF setup
+python U:\Personal\Federico\GitRepos\simple-vs\wf_main.py

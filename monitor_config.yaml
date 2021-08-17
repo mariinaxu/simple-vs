@@ -1,21 +1,25 @@
 #Configuration section for the monitor being used
 # By default monitor is full screen TODO is this ok?
 monitor_name: 'FED_IIYAMA_23'
-monitor_width_pixels: 1920
-monitor_height_pixels: 1080
-monitor_width_cm: 52.2
+#monitor_width_pixels: 1920
+#monitor_height_pixels: 1080
+#monitor_width_cm: 52.2
+
+monitor_width_pixels: 1600
+monitor_height_pixels: 900
+monitor_width_cm: 30
 screen_id: 0
 viewing_distance_cm: 30
-monitor_gamma: None
-monitor_gamma_lut: '/home/k1n4s3/LABSERVER6/Personal/Federico/GitRepos/monitor-calibrations/IIYAMA_Prolite_LE4041UHS.npy'
+monitor_gamma: 2.55
+#monitor_gamma_lut: '/home/k1n4s3/LABSERVER6/Personal/Federico/GitRepos/monitor-calibrations/IIYAMA_Prolite_LE4041UHS.npy'
 
 
 # TODO need to add square settings
 # UNITS in pixels
 # [width, size
-square_size: [600, 600]
-square_position: [-960 , -540] # find a nicer way to specify, but this is basically -(resolution/2) for left corner
-
+square_size: [300, 300]
+#square_position: [-960 , -540] # find a nicer way to specify, but this is basically -(resolution/2) for left corner
+square_position: [-800 , -450] # find a nicer way to specify, but this is basically -(resolution/2) for left corner
 
 # color units are 0->1 (1 is max white)
 square_color_off: [-1]

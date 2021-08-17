@@ -3,15 +3,15 @@
 # All delays in seconds
 name: "DynamicBatteryTuning"
 
-n_trials: 650
+n_trials: 200
 
 # the delay before starting and after ending the experiment (black square comes on at half of this time)
-experiment_delay: 8
+experiment_delay: 1
 # stim on length
-stim_length: 0.5
+stim_length: 0.25
 
 # stim off length (iti)
-inter_trial_delay: 1.0
+inter_trial_delay: 0.75
 
 #Parameters of visual stimuli
 
@@ -19,12 +19,12 @@ inter_trial_delay: 1.0
 # spatial frequency, orientation, stimulus size
 # phase alternates at the half period of the stimulus
 grating_position: [0, 0]
-grating_orientations: [0, 45, 90, 135]
-grating_sfs: [0.02, 0.04, 0.1, 0.2]
-grating_sizes: [25, 50, 80, 100] # assumes sizes equal along x and y axes. 
+grating_orientations: [0]
+grating_sfs: [0.0222]
+grating_sizes: [100] # assumes sizes equal along x and y axes. 
 
 
-give_blanks: True
+give_blanks: False
 
 
 grating_mask: 'raisedCos'
