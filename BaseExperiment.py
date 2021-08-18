@@ -80,6 +80,16 @@ class BaseExperiment(ABC):
         self.monitor = psychopy.monitors.Monitor(monitor_name, width=monitor_width_cm, distance=viewing_distance_cm, gamma=1)
         self.monitor.setSizePix((monitor_width_pixels, monitor_height_pixels))
 
+
+        #TODO FB additional fields that are sometimes used (i.e LocallySparseNoise)
+        # AWFUL idea but not sure what is the right way to do this, should I write a FBMonitor class with the additional fields...?
+        monitor_height_cm = monitor_width_cm*(monitor_height_pixels/monitor_width_pixels)
+        
+        # Following coordinate system assumes (0, 0) is the center of the monitor
+        self.monitor.azi_min_coord = -np.arctan((monitor_width_cm/2)/viewing_distance_cm)*180/np.pi
+        self.monitor.azi_max_coord = np.arctan((monitor_width_cm/2)/viewing_distance_cm)*180/np.pi
+        self.monitor.alt_min_coord = -np.arctan((monitor_height_cm/2)/viewing_distance_cm)*180/np.pi
+        self.monitor.alt_max_coord = np.arctan((monitor_height_cm/2)/viewing_distance_cm)*180/np.pi
         
         # TODO  check if monitor needs to get saved in win
         #self.monitor.save()
@@ -96,6 +106,8 @@ class BaseExperiment(ABC):
         gray = 255*(0.5 ** (1/self.gamma))
         gray -= 128
         gray /= 128
+
+        self.gray = gray
         
         print("linearized gray applied!")
 

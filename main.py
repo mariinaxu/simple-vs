@@ -16,6 +16,7 @@ from TextureExperimentFBVGG import TextureExperimentFBVGG
 from TextureExperimentFBVGGMultiTime import TextureExperimentFBVGGMultiTime
 from DynamicBatteryExperiment import  DynamicBatteryExperiment
 from SquareExperiment import SquareExperiment
+from LocallySparseNoiseExperiment import LocallySparseNoiseExperiment
 
 bool_DEBUG = True
 
@@ -40,7 +41,8 @@ if __name__ == "__main__":
         # change the line below to use PCO or NIS (2p)
         data_aq = NISDAQ(experiment_id)
         #data_aq = PCODAQ(experiment_id)
-        exp = DynamicBatteryExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "dynamic_battery_config.yaml", debug=bool_DEBUG)
+        exp = LocallySparseNoiseExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "locally_sparse_noise_config.yaml", debug=bool_DEBUG)
+        #exp = DynamicBatteryExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "dynamic_battery_config.yaml", debug=bool_DEBUG)
         #exp = SimpleOrientationExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "simple_orientation_config.yaml", debug=bool_DEBUG)
         
         #exp = TextureExperimentFBVGG(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "texture_FB-VGG_config.yaml", debug=bool_DEBUG)
@@ -63,5 +65,5 @@ if __name__ == "__main__":
         if exp.acquisition_running:
             exp.stop_data_acquisition()
     finally:
-        del exp.data_aq
+        print("Completed experiment routine. Thanks!")
 
