@@ -23,16 +23,12 @@ class LocallySparseNoise():
 
     Parameters
     ----------
-    monitor : monitor object
-        contains display monitor information
     min_distance : float, default 20.
         the minimum distance in visual degree for any pair of probe centers
         in a given frame
     probe_size : 2-tuple of floats, optional
         size of flicker probes. First coordinate defines the width, and
         second coordinate defines the height
-    probe_orientation : float, optional
-        orientation of flicker probes
     sign : {'ON-OFF', 'ON', 'OFF'}, optional
         determines which pixels appear in the `subregion`, defaults to
         `'ON-Off'` so that both on and off pixels appear. If `'ON` selected
@@ -45,11 +41,6 @@ class LocallySparseNoise():
     repeat : int, optional
         number of repeat of whole sequence, the total number a paticular probe
         to be displayded will be iteration * repeat, defaults to `1`
-    is_include_edge : bool, default True,
-        if True, the displayed probes will cover the edge case and ensure that
-        the entire subregion is covered.
-        If False, the displayed probes will exclude edge case and ensure that all
-        the centers of displayed probes are within the subregion.
     """
 
     def __init__(self, monitor, min_distance=20., probe_size=(10., 10.),
