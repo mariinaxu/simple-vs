@@ -6,7 +6,7 @@ import psychopy.monitors
 import numpy as np
 import yaml
 
-class SimpleOrientationExperiment(BaseExperiment):
+class ElevationMapperExperiment(BaseExperiment):
     def load_experiment_config(self, ):
         with open (self.exp_parameters_filename, 'r') as file:
             self.exp_parameters = yaml.load(file, Loader=yaml.FullLoader)
@@ -14,19 +14,25 @@ class SimpleOrientationExperiment(BaseExperiment):
         # Name of experiment params
         self.exp_protocol = self.exp_parameters['name']
 
+
         # Load n trials and timing lengths
-        self.n_trials = self.exp_parameters['n_trials']
+        self.n_trials = None
+        self.n_trials_per_stimulus = self.exp_parameters['n_trials_per_stimulus']
         self.experiment_delay = self.exp_parameters['experiment_delay']
-        self.stim_length = self.exp_parameters['stim_length']
+        self.stim_duration = self.exp_parameters['stim_duration']
+        self.temporal_frequency = self.exp_parameters['temporal_frequency']
         self.inter_trial_delay = self.exp_parameters['inter_trial_delay']
 
+        self.flicker_period = 1/float(self.temporal_frequency)
+        self.flicker_clock = psychopy.core.Clock()
+
         # Load the stim parameters
-        self.grating_sf = self.exp_parameters['grating_sf']
-        self.grating_position = self.exp_parameters['grating_position']
+        self.tex = self.exp_parameters['tex']
+        self.grating_sfs = self.exp_parameters['grating_sfs']
+        self.grating_positions = self.exp_parameters['grating_positions']
         self.grating_orientations = self.exp_parameters['grating_orientations']
         self.give_blanks = self.exp_parameters['give_blanks']
-        self.grating_phase_temporal_frequency = self.exp_parameters['grating_phase_temporal_frequency']
-        self.grating_phases_range = self.exp_parameters['grating_phases_range']
+        #self.grating_phase_temporal_frequency = self.exp_parameters['grating_phase_temporal_frequency']
         self.grating_size = self.exp_parameters['grating_size']
         self.grating_mask = self.exp_parameters['grating_mask']
 
@@ -34,9 +40,9 @@ class SimpleOrientationExperiment(BaseExperiment):
         self.experiment_stims = []
         self.generate_stimuli()
 
-        # ps stands for psychopy... 
-        self.ps_grating = psychopy.visual.GratingStim(win=self.window, units="deg", pos=self.grating_position, sf=self.grating_sf,
-                                                       size=self.grating_size, mask=self.grating_mask)
+        # ps stands for psychopy...
+        self.ps_grating = psychopy.visual.GratingStim(win=self.window, tex=self.tex, units="deg", pos=self.grating_positions[0], sf=self.grating_sfs[0],
+                                                       size=[self.grating_size[0], self.grating_size[1]], mask=self.grating_mask)
 
         # log the experiment parameters
         #self.exp_log.log.create_dataset("exp_parameters", data=self.exp_protocol)
@@ -51,22 +57,27 @@ class SimpleOrientationExperiment(BaseExperiment):
         self.exp_log.log['daq_sampling_rate'] = self.daq.sampling_rate
 
     def generate_stimuli(self):
+        all_possible_stims = []
+        for pos in self.grating_positions:
+            for ori in self.grating_orientations:
+                for sf in self.grating_sfs:
+                    all_possible_stims.append([pos, ori, sf])
+                    
+
         if self.give_blanks:
-            all_possible_stims = self.grating_orientations
             all_possible_stims.append('blank')
-        else:
-            all_possible_stims = self.grating_orientations
 
-        n_stims_per_condition = (self.n_trials//len(all_possible_stims))
-        if n_stims_per_condition * len(all_possible_stims) != self.n_trials:
-            raise Exception("Please make the number of trials divisible by total possible stims")
 
-        self.experiment_stims = all_possible_stims * (self.n_trials//len(all_possible_stims))
+        self.n_trials = len(all_possible_stims) * self.n_trials_per_stimulus
+        print("In total there will be {} stimuli shown.".format(self.n_trials))
+
+
+        self.experiment_stims = all_possible_stims * self.n_trials_per_stimulus
 
         np.random.shuffle(self.experiment_stims)
 
 
-        
+
 
 
     def run_experiment(self, ):
@@ -76,7 +87,7 @@ class SimpleOrientationExperiment(BaseExperiment):
         # pre experiment delay
         self.clock.reset()
         self.master_clock.reset()
-        
+
         # Half of the experiment delay there is no black square and then we draw it, that's when the experiment starts.
         while self.clock.getTime() < self.experiment_delay:
             if self.clock.getTime() >= self.experiment_delay/2:
@@ -91,35 +102,60 @@ class SimpleOrientationExperiment(BaseExperiment):
 
         for trial in range(self.n_trials):
             print("Trial {} out of {}.".format(trial+1, self.n_trials))
-            current_orientation = self.experiment_stims[trial]
+            current_orientation = self.experiment_stims[trial][0]
+
+            current_pos = self.experiment_stims[trial][0]
+            current_orientation = self.experiment_stims[trial][1]
+            current_sf = self.experiment_stims[trial][2]
+            #current_phase = 90/360
+
             #current_phase = np.random.randint(self.grating_phases_range[0], self.grating_phases_range[1])
 
-            if current_orientation != 'blank':
+            if self.experiment_stims[trial] != 'blank':
                 self.ps_grating.ori = current_orientation
-            self.ps_grating.phase = 0
+                self.ps_grating.sf = current_sf
+                self.ps_grating.pos = current_pos
+                #self.ps_grating.size = current_size
+                #self.ps_grating.phase = current_phase#np.round(np.random.random(), 2)
+
+
 
 
             total_time = 0
             self.clock.reset()
-
+            self.flicker_clock.reset()
             self.photodiode_square.fillColor = self.photodiode_square.lineColor = self.square_color_on
             # Log stimulus
             # TODO figure out how to dump all the PS grating information easily....
-            self.exp_log.log_stimulus(self.master_clock.getTime(), trial, current_orientation, 0)
-            while self.clock.getTime() < self.stim_length:
+            self.exp_log.log_stimulus(self.master_clock.getTime(), trial, [current_orientation, current_sf, current_pos[0], current_pos[1]], -1)
+            while self.clock.getTime() < self.stim_duration:
+
+
+                if self.flicker_clock.getTime() < self.flicker_period/2:
+                    self.ps_grating.phase = 90/360
+                elif self.flicker_clock.getTime() >= self.flicker_period/2 and self.flicker_clock.getTime() < self.flicker_period:
+                    self.ps_grating.phase = 270/360
+                else:
+                    self.flicker_clock.reset()
+
 
                 # temporal frequency change
-                self.ps_grating.phase = np.mod(self.clock.getTime(), 1)
+                #if self.clock.getTime() < self.stim_length/2:
+                #    self.ps_grating.phase = 90/360
+                #else:
+                #    self.ps_grating.phase = 270/360
+                #self.ps_grating.phase = np.mod(self.clock.getTime(), 1)
 
-                # log stim ON
-                if current_orientation != 'blank':
+                #self.ps_grating.contrast = 1 - (1/(self.stim_length/2))*np.mod(self.clock.getTime(), self.stim_length)
+
+                if self.experiment_stims[trial] != 'blank':
                     self.ps_grating.draw()
                 self.photodiode_square.draw()
 
                 self.window.flip()
             self.photodiode_square.fillColor = self.photodiode_square.lineColor = self.square_color_off
 
-            total_time += self.stim_length
+            total_time += self.stim_duration
 
 
             while self.clock.getTime() < total_time+self.inter_trial_delay:

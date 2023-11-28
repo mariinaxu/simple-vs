@@ -5,14 +5,31 @@ monitor_name: 'FED_IIYAMA_23'
 #monitor_height_pixels: 1080
 #monitor_width_cm: 52.2
 
+use_spherical_warp: False
+
 monitor_width_pixels: 1920
 monitor_height_pixels: 1080
-monitor_width_cm: 30
-screen_id: 0
-viewing_distance_cm: 10
-monitor_gamma: 2.55
+monitor_width_cm: 52.5
+monitor_height_cm: 29.5
+screen_id: 1
+viewing_distance_cm: 15
+monitor_gamma: 1
+monitor_refresh_rate: 60
+
 #monitor_gamma_lut: '/home/k1n4s3/LABSERVER6/Personal/Federico/GitRepos/monitor-calibrations/IIYAMA_Prolite_LE4041UHS.npy'
 
+######## Only Used for Retinotopy Experiments
+# Monitor extra settings
+mon_center_coordinates: [0., 60.]
+mon_downsample_rate: 5
+#mon_gamma: 2
+
+# indicator settings
+ind_width_cm: 3.
+ind_height_cm: 3.
+ind_position: 'southeast'
+ind_is_sync: true
+ind_freq: 1.
 
 # TODO need to add square settings
 # UNITS in pixels

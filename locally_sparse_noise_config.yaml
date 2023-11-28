@@ -4,12 +4,10 @@
 name: "LocallySparseNoise"
 
 
-
-
 # the delay before starting and after ending the experiment (black square comes on at half of this time)
-experiment_delay: 8
+experiment_delay: 2
 # stim on length
-stim_length: 0.25
+stim_length: 1.0
 
 # this experiment has no ITI, every time the stimulus changes at 'stim_length' intervals
 

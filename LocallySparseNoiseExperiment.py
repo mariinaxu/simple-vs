@@ -120,7 +120,8 @@ class LocallySparseNoiseExperiment(BaseExperiment):
 
 
         ## Stimuli start being shown here
-        for i, index in enumerate(self.experiment_indices):            
+        for i, index in enumerate(self.experiment_indices):       
+            print("Frame {} out of {}.".format(i+1, len(self.experiment_indices)))
             probes_params = self.experiment_stims[index][1] 
 
             for j in range(len(probes_params)):

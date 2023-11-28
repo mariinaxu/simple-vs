@@ -11,8 +11,9 @@ if platform == "win32":
 
 # TODO consider making a BaseDAQ such that one can use the pco system too
 class PCODAQ:
-    def __init__(self, experiment_id):
+    def __init__(self, experiment_id, DEBUG):
         self.experiment_id = experiment_id
+        self.DEBUG = DEBUG
 
         # TODO make it a yaml settings
         self.ip_address_list = ["172.17.150.209", "172.17.150.224"]
@@ -29,12 +30,12 @@ class PCODAQ:
         self.ni_log_filename = None
         self.data = []
 
-        if platform == "win32":
+        if platform == "win32" and not self.DEBUG:
             self.create_NI_tasks()                        
 
 
     def __del__(self):
-        if platform == "win32":
+        if platform == "win32" and not self.DEBUG:
             self.ai_log_task.close()
             self.out_ttl_task.close()
 
@@ -45,7 +46,7 @@ class PCODAQ:
         self.ai_log_task = ni.Task()
         self.ai_log_task.ai_channels.add_ai_voltage_chan("Dev1/ai0:7")
         #self.ai_log_task.ci_channels.add_ci_xx() #TODO
-        self.ai_log_task.timing.cfg_samp_clk_timing(rate=self.sampling_rate, sample_mode=ni.constants.AcquisitionType.CONTINUOUS)
+        self.ai_log_task.timing.cfg_samp_clk_timing(rate=self.sampling_rate, sample_mode=ni.constants.AcquisitionType.CONTINUOUS, samps_per_chan=5000000)
         self.ai_log_task.register_every_n_samples_acquired_into_buffer_event(self.sampling_rate, self.data_read_callback)
 		
 	

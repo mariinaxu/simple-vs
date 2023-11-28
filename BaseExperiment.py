@@ -9,6 +9,7 @@ from sys import platform
 import os
 from time import sleep
 import numpy as np
+from psychopy.visual.windowwarp import Warper
 
 class BaseExperiment(ABC):
     def __init__(self, experiment_id, mouse_id, daq, monitor_config_filename, save_settings_config_filename, exp_config_filename, debug):
@@ -72,7 +73,7 @@ class BaseExperiment(ABC):
         monitor_width_cm = self.monitor_settings['monitor_width_cm']
         viewing_distance_cm = self.monitor_settings['viewing_distance_cm']
         monitor_gamma = self.monitor_settings['monitor_gamma']
-        
+        self.refresh_rate = self.monitor_settings['monitor_refresh_rate']
         
         self.gamma = self.monitor_settings['monitor_gamma']
  
@@ -119,8 +120,23 @@ class BaseExperiment(ABC):
                                             units='deg',
                                             screen=self.monitor_settings['screen_id'],
                                             allowGUI=False,
-                                            fullscr=False,
-                                            waitBlanking=True)
+                                            fullscr=True,
+                                            waitBlanking=True,
+                                            useFBO=True)
+
+
+        if self.monitor_settings['use_spherical_warp']:
+            self.warper = Warper(self.window,
+                    warp='spherical',
+                    warpfile = "",
+                    warpGridsize = 128,
+                    eyepoint = (0.5, 0.5),
+                    flipHorizontal = False,
+                    flipVertical = False)
+
+            print("Using spherical warping!")
+
+        
         #self.window.gammaRamp = monitor_gamma_lut
 
 
@@ -168,13 +184,13 @@ class BaseExperiment(ABC):
         if self.daq is None:
             raise Exception("Please set the daq object, it has not been set.")
 
-        if platform == "win32":
+        if platform == "win32" and not self.debug:
             self.acquisition_running = True
             self.daq.start_everything()
 
 
     def stop_data_acquisition(self,):
-        if platform == "win32":
+        if platform == "win32" and not self.debug:
             self.daq.stop_everything()
             self.acquisition_running = False
 

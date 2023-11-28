@@ -9,6 +9,7 @@ from datetime import datetime
 
 from NISDAQ import NISDAQ
 from PCODAQ import PCODAQ
+from HTDAQ import HTDAQ
 
 from SimpleOrientationExperiment import SimpleOrientationExperiment
 from TextureExperimentFB import TextureExperimentFB
@@ -17,6 +18,9 @@ from TextureExperimentFBVGGMultiTime import TextureExperimentFBVGGMultiTime
 from DynamicBatteryExperiment import  DynamicBatteryExperiment
 from SquareExperiment import SquareExperiment
 from LocallySparseNoiseExperiment import LocallySparseNoiseExperiment
+from ElevationMapperExperiment import ElevationMapperExperiment
+from RetinotopyExperiment import RetinotopyExperiment
+
 
 bool_DEBUG = False
 
@@ -40,10 +44,13 @@ if __name__ == "__main__":
         experiment_id, mouse_id = create_experiment_name()
         # change the line below to use PCO or NIS (2p)
         
-        data_aq = PCODAQ(experiment_id)
-        exp = LocallySparseNoiseExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "locally_sparse_noise_config.yaml", debug=bool_DEBUG)
+        data_aq = HTDAQ(experiment_id, bool_DEBUG)
+        #exp = LocallySparseNoiseExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "locally_sparse_noise_10deg_config.yaml", debug=bool_DEBUG)
         #exp = DynamicBatteryExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "dynamic_battery_config.yaml", debug=bool_DEBUG)
         #exp = SimpleOrientationExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "simple_orientation_config.yaml", debug=bool_DEBUG)
+        #exp = TextureExperimentFBVGG(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "fullfield-texture_FB-VGG_config.yaml", debug=bool_DEBUG)
+        #exp = ElevationMapperExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "elevation_mapper_config.yaml", debug=bool_DEBUG)
+        exp = RetinotopyExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "retinotopy_config.yaml", debug=bool_DEBUG)
         #exp = TextureExperimentFBVGG(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "texture_FB-VGG_config.yaml", debug=bool_DEBUG)
         #exp = TextureExperimentFBVGGMultiTime(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "texture_FB-VGGMultiTime_config.yaml", debug=bool_DEBUG)
         #exp = SquareExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "square_config.yaml", debug=bool_DEBUG)
