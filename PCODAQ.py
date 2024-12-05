@@ -2,7 +2,7 @@ from sys import platform
 import socket
 from time import sleep, time
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 # control NI dacs only on windows
 if platform == "win32":
@@ -16,14 +16,14 @@ class PCODAQ:
         self.DEBUG = DEBUG
 
         # TODO make it a yaml settings
-        self.ip_address_list = ["172.17.150.209", "172.17.150.224"]
+        self.ip_address_list = ["137.82.137.183"]
         if platform == "win32":
             self.port = 1001
         else:
             self.port = 10001
 
         # TODO make into a proper setting????
-        self.sampling_rate = 5000
+        self.sampling_rate = 4000
         self.sock = socket.socket(socket.AF_INET,
                                   socket.SOCK_DGRAM)
 
@@ -44,7 +44,7 @@ class PCODAQ:
     # TODO make the channels into a settings file somehow...
     def create_NI_tasks(self):
         self.ai_log_task = ni.Task()
-        self.ai_log_task.ai_channels.add_ai_voltage_chan("Dev1/ai0:7")
+        self.ai_log_task.ai_channels.add_ai_voltage_chan("Dev1/ai0:4")
         #self.ai_log_task.ci_channels.add_ci_xx() #TODO
         self.ai_log_task.timing.cfg_samp_clk_timing(rate=self.sampling_rate, sample_mode=ni.constants.AcquisitionType.CONTINUOUS, samps_per_chan=5000000)
         self.ai_log_task.register_every_n_samples_acquired_into_buffer_event(self.sampling_rate, self.data_read_callback)
@@ -123,29 +123,57 @@ class PCODAQ:
 
 
     def save_log(self, filename):
-        self.data = np.asarray(self.data).astype(np.float16)
-        
+        self.data = np.hstack(self.data).astype(np.float16)
         np.save(filename, self.data)
         print("Saved NI log (size): ", filename, self.data.shape)
         
         
      
 if __name__ == "__main__":
-    data = []
-    data2 = []
-    DEBUG = True
-    
-    out_ttl_task = ni.Task()
-    out_ttl_task.do_channels.add_do_chan("Dev1/port1/line0", line_grouping=ni.constants.LineGrouping.CHAN_FOR_ALL_LINES)
-    
+    experiment_id = "test_experiment"
+    DEBUG = False
+
+    # Create an instance of the PCODAQ class
+    daq = PCODAQ(experiment_id, DEBUG)
+    input("Press enter to start the fake experiment.")
     try:
-        while True:
-            input("Press enter to make it true")
-            out_ttl_task.write([True])
-            print("Made it True")
-            input("Press enter to make it false")
-            out_ttl_task.write([False])
-            print("Made it false.")
-    except KeyboardInterupt:
-        out_ttl_task.close()
-        print("Properly closed the task")
+        # Start data acquisition
+        daq.start_logging()
+        print("Data acquisition started. Running for 10 seconds...")
+        sleep(1)
+        daq.start_cameras()
+        # Wait for 10 seconds
+        sleep(10)
+        daq.stop_cameras()
+        sleep(1)
+        # Stop data acquisition
+        daq.stop_logging()
+        print("Data acquisition stopped.")
+
+        # Save the logged data
+        filename = "labjack_data.npy"
+        daq.save_log(filename)
+        print("Data saved to", filename)
+
+        # Load the saved data
+        saved_data = np.load(filename)
+
+        # Plotting the data
+        plt.figure(figsize=(10, 8))
+
+        n_channels = saved_data.shape[0]
+        time_axis = np.arange(saved_data.shape[1]) / float(daq.sampling_rate)
+
+        for i in range(n_channels):
+            plt.subplot(n_channels, 1, i+1)
+            plt.plot(time_axis, saved_data[i, :])
+            plt.title(f'Channel {i}')
+            plt.xlabel('Time (s)')
+            plt.ylabel('Voltage (V)')
+
+        plt.tight_layout()
+        plt.show()
+
+    finally:
+        # Clean up
+        del daq

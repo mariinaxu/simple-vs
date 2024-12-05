@@ -5,11 +5,11 @@ name: "RetinotopyFB"
 
 
 # the delay before starting and after ending the experiment (black square comes on at half of this time)
-experiment_delay: 0
+experiment_delay: 8
 
 
 DisplaySequence:
-  ds_log_dir: C:\Users\Feder\VS-data
+  ds_log_dir: C:\\Users\\WorkStation\\VS-data
   ds_backupdir: null
   ds_identifier: TEST
   ds_display_iter: 1.0
@@ -37,14 +37,14 @@ generic_stimulus_parameters:
   post_gap_dur: 3.0
   background: 0.0
   coordinate: degree
-  block_iterations: 10 # same as ds_display_iter or repeat in ab lab
+  block_iterations: 30 #30  #orginal is 20 # same as ds_display_iter or repeat in ab lab
 
 KSstimAllDir:
   ks_square_size: 25.0
   ks_square_center: [0, 0]
   ks_flicker_frame: 10
   ks_sweep_width: 20.0
-  ks_step_width: 1 #0.15
+  ks_step_width: 0.15
   ks_sweep_frame: 1 
   ks_iteration: 1 # don't change this
 

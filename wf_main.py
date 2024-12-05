@@ -7,7 +7,8 @@ import numpy as np
 from time import sleep, time
 from datetime import datetime
 
-from NISDAQ import NISDAQ
+# the imports below are no longer needed, since for now there is no need to support NIDAQMX anymore
+#from NISDAQ import NISDAQ
 from PCODAQ import PCODAQ
 from HTDAQ import HTDAQ
 
@@ -44,7 +45,7 @@ if __name__ == "__main__":
         experiment_id, mouse_id = create_experiment_name()
         # change the line below to use PCO or NIS (2p)
         
-        data_aq = HTDAQ(experiment_id, bool_DEBUG)
+        data_aq = PCODAQ(experiment_id, bool_DEBUG)
         #exp = LocallySparseNoiseExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "locally_sparse_noise_10deg_config.yaml", debug=bool_DEBUG)
         #exp = DynamicBatteryExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "dynamic_battery_config.yaml", debug=bool_DEBUG)
         #exp = SimpleOrientationExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "simple_orientation_config.yaml", debug=bool_DEBUG)
