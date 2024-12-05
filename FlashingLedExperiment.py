@@ -61,7 +61,7 @@ class FlashingLedExperiment(BaseExperiment):
         self.experiment_running.set()
 
         # Start camera triggers
-        self.start_cameras()
+        self.daq.start_cameras()
 
         # Start LED monitoring threads
         ir_thread = threading.Thread(target=self.ir_led_monitor)
@@ -75,7 +75,7 @@ class FlashingLedExperiment(BaseExperiment):
             time.sleep(0.1)
 
         # Stop cameras
-        self.stop_cameras()
+        self.daq.stop_cameras()
 
         # Wait additional 3 seconds for any remaining signals
         print("\nWaiting 3 seconds for final signals...")
@@ -85,5 +85,9 @@ class FlashingLedExperiment(BaseExperiment):
         self.acquisition_running = False
         ir_thread.join()
         blue_thread.join()
+
+        # Save the NI data
+        if self.daq.ni_log_filename:
+            self.daq.save_data(self.daq.ni_log_filename)
 
         return True  # Experiment completed successfully

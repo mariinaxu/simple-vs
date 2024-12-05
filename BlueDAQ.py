@@ -3,6 +3,7 @@ import socket
 from time import sleep, time
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 # control NI dacs only on windows
 if platform == "win32":
@@ -24,7 +25,8 @@ class BlueDAQ:
         self.sampling_rate = 4000
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-        self.ni_log_filename = None
+        # Set up log filename
+        self.ni_log_filename = os.path.join(os.getcwd(), f"{self.experiment_id}_ni.npy")
         self.data = []
 
         if platform == "win32" and not self.DEBUG:
@@ -95,7 +97,9 @@ class BlueDAQ:
     def save_data(self, filename):
         """Save acquired data"""
         if len(self.data) > 0:
+            print(f"\nSaving NI data to {filename}")
             np.save(filename, np.hstack(self.data))
+            print("Data saved successfully")
 
     # Camera triggering methods (kept from PCODAQ)
     def start_cameras(self):
