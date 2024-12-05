@@ -106,10 +106,19 @@ class BlueDAQ:
         if platform == "win32" and not self.DEBUG:
             self.out_ttl_task.write(True)
         for ip_address in self.ip_address_list:
-            self.sock.sendto(b"start", (ip_address, self.port))
+            message1 = "ExpStart {} 1 1".format(self.experiment_id)
+            message2 = "StimStart {} 1 1 1".format(self.experiment_id)
+            
+            self.sock.sendto(str.encode(message1), (ip_address, self.port))
+            self.sock.sendto(str.encode(message2), (ip_address, self.port))
 
     def stop_cameras(self):
         if platform == "win32" and not self.DEBUG:
             self.out_ttl_task.write(False)
         for ip_address in self.ip_address_list:
-            self.sock.sendto(b"stop", (ip_address, self.port)) 
+            message1 = "StimEnd {} 1 1 1".format(self.experiment_id)
+            message2 = "ExpEnd {} 1 1".format(self.experiment_id)
+
+            
+            self.sock.sendto(str.encode(message1), (ip_address, self.port)) 
+            self.sock.sendto(str.encode(message2), (ip_address, self.port)) 

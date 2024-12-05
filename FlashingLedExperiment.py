@@ -33,13 +33,13 @@ class FlashingLedExperiment(BaseExperiment):
             if self.daq.read_digital_input(self.IR_DIGITAL_PIN):
                 if not self.ir_led_active.is_set():
                     self.ir_led_active.set()
-                    self.experiment_log.log_exp_start()
+                    self.exp_log.log_exp_start(time.time())
                     print("\nIR LED ON - Experiment started")
                     print("Monitoring for blue LED flashes...")
             else:
                 if self.ir_led_active.is_set():
                     self.ir_led_active.clear()
-                    self.experiment_log.log_exp_end()
+                    self.exp_log.log_exp_end(time.time(), self.blue_flash_count)
                     self.experiment_running.clear()
                     print(f"\nIR LED OFF - Experiment ended")
                     print(f"Total blue LED flashes detected: {self.blue_flash_count}")
@@ -50,7 +50,7 @@ class FlashingLedExperiment(BaseExperiment):
         while self.experiment_running.is_set() and self.ir_led_active.is_set():
             if self.daq.read_digital_input(self.BLUE_DIGITAL_PIN):
                 self.blue_flash_count += 1
-                self.experiment_log.log_stimulus()
+                self.exp_log.log_stimulus( time.time(), self.blue_flash_count, ["led"], "blue_led")
                 print(f"Blue LED flash detected ({self.blue_flash_count})", end='\r')
             time.sleep(0.001)  # Small sleep to prevent CPU hogging
 
