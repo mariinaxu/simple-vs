@@ -119,17 +119,17 @@ class BaseExperiment(ABC):
                                             colorSpace='rgb',
                                             units='deg',
                                             screen=self.monitor_settings['screen_id'],
-                                            allowGUI=False,
-                                            fullscr=True,
-                                            waitBlanking=True,
-                                            useFBO=True)
+                                            allowGUI=False, #False for real experiment
+                                            fullscr=False, #True " "
+                                            waitBlanking=True, #True " "
+                                            useFBO=True) #True " "
 
 
         if self.monitor_settings['use_spherical_warp']:
             self.warper = Warper(self.window,
                     warp='spherical',
                     warpfile = "",
-                    warpGridsize = 128,
+                        warpGridsize = 128,
                     eyepoint = (0.5, 0.5),
                     flipHorizontal = False,
                     flipVertical = False)
@@ -202,3 +202,4 @@ class BaseExperiment(ABC):
     @abstractmethod
     def run_experiment(self,):
         pass
+

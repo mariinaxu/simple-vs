@@ -1,4 +1,4 @@
-LABSERVER_DIR_WIN: "\\\\files.ubc.ca\\team\\BNRC\\NINC\\federico\\MurphyLab\\simple-vs-debug"
+LABSERVER_DIR_WIN: "C:\\\\Data\\simple_debug"
 # LABSERVER_DIR_LIN: "/home/k1n4s3/LABSERVER6/MOUSE/FB_2P_Analysis/2p_TEX/"
 #LABSERVER_DIR_LIN: "/home/k1n4s3/TESTS/"
 #LABSERVER_DIR_LIN: "/home/manatee/TESTS/"

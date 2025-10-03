@@ -46,7 +46,7 @@ if __name__ == "__main__":
         #exp = DynamicBatteryExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "dynamic_battery_config.yaml", debug=bool_DEBUG)
         #exp = SimpleOrientationExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "simple_orientation_config.yaml", debug=bool_DEBUG)
         
-        exp = ElevationMapperExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "elevation_mapper_config.yaml", debug=bool_DEBUG)
+        #exp = ElevationMapperExperiment(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "elevation_mapper_config.yaml", debug=bool_DEBUG)
         #exp = TextureExperimentFBVGG(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "fullfield-texture_FB-VGG_config.yaml", debug=bool_DEBUG)
         #exp = TextureExperimentFBVGG(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "texture_FB-VGG_config.yaml", debug=bool_DEBUG)
         #exp = TextureExperimentFBVGGMultiTime(experiment_id, mouse_id, data_aq, "monitor_config.yaml", "save_settings_config.yaml", "texture_FB-VGGMultiTime_config.yaml", debug=bool_DEBUG)

@@ -89,6 +89,18 @@ class RetinotopyExperiment(BaseExperiment):
         # TODO improve, I feel like calls to create_dset should be within DAQ class
         #self.exp_log.log.create_dataset("daq_sampling_rate", data=self.daq.sampling_rate)
         self.exp_log.log['daq_sampling_rate'] = self.daq.sampling_rate
+        
+    def load_window(self):
+        # true half max luminance
+        gray = 255*(0.5 ** (1/self.gamma))
+        gray -= 128
+        gray /= 128
+
+        self.gray = gray
+        print("No window will be made for OG simple-vs")
+        
+    def create_photodiode_square(self):
+        print("No OG simple-vs photodiode square because Allen Institute already has one")
 
     def generate_stimuli(self):
         self.keep_display = True
@@ -102,10 +114,11 @@ class RetinotopyExperiment(BaseExperiment):
                                             colorSpace='rgb',
                                             units='pix',
                                             screen=self.monitor_settings['screen_id'],
-                                            allowGUI=False,
-                                            fullscr=True,
-                                            waitBlanking=True,
-                                            useFBO=True)
+                                            allowGUI=True,
+                                            fullscr=False,
+                                            waitBlanking=False,
+                                            useFBO=False)
+        
         self.stim = psychopy.visual.ImageStim(self.window, size=resolution, interpolate=False)
 
 

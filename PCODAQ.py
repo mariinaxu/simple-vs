@@ -3,6 +3,9 @@ import socket
 from time import sleep, time
 import numpy as np
 import matplotlib.pyplot as plt
+import serial 
+import threading 
+import yaml
 
 # control NI dacs only on windows
 if platform == "win32":
@@ -31,7 +34,7 @@ class PCODAQ:
         self.data = []
 
         if platform == "win32" and not self.DEBUG:
-            self.create_NI_tasks()                        
+            self.create_NI_tasks()          
 
 
     def __del__(self):
@@ -128,22 +131,26 @@ class PCODAQ:
         print("Saved NI log (size): ", filename, self.data.shape)
         
         
-     
+
 if __name__ == "__main__":
     experiment_id = "test_experiment"
     DEBUG = False
 
     # Create an instance of the PCODAQ class
     daq = PCODAQ(experiment_id, DEBUG)
+
+
     input("Press enter to start the fake experiment.")
     try:
         # Start data acquisition
         daq.start_logging()
         print("Data acquisition started. Running for 10 seconds...")
         sleep(1)
+
         daq.start_cameras()
         # Wait for 10 seconds
         sleep(10)
+
         daq.stop_cameras()
         sleep(1)
         # Stop data acquisition
@@ -177,3 +184,58 @@ if __name__ == "__main__":
     finally:
         # Clean up
         del daq
+
+
+
+####
+class Teensy:
+    def __init__(self, experiment_id, DEBUG, teensy_params):
+        self.teensy_parameters_filename = teensy_params
+        with open (self.teensy_parameters_filename, 'r') as file:
+            self.teensy_parameters = yaml.load(file, Loader=yaml.FullLoader)
+
+        # Load n trials and timing lengths
+        self.port = self.teensy_parameters['port']
+        self.BAUD = self.teensy_parameters['BAUD']
+
+        self.ser = serial.Serial(self.port, self.BAUD, timeout = 1)
+        sleep(2)
+        self.ser.reset_input_buffer()
+        self.ser.reset_output_buffer()
+        print("Serial connected.")
+
+        self.F_LED = self.teensy_parameters['F_LED']
+        self.E_LED = self.teensy_parameters['E_LED']
+        self.O_CAM = self.teensy_parameters['O_CAM']
+        self.cam_start_mode = self.teensy_parameters['cam_start_mode']
+        self.ttls_start_mode = self.teensy_parameters['ttls_start_mode']
+        self.dual_mode = self.teensy_parameters['dual_mode']
+        self.ttl_width = self.teensy_parameters['ttl_width']
+
+        self.reader_thread = threading.Thread(target = self.read_teensy, daemon = True)
+        self.reader_thread.start()
+        self.stop_teensy()
+        sleep(2)    
+
+    def read_teensy(self):   
+        while True:
+            try:
+                if self.ser.in_waiting > 0:
+                    line = self.ser.readline().decode().strip()
+                    if line:
+                        print("Teensy:", line)
+            except Exception as e:
+                print("Teensy read error:", repr(e))
+                break
+
+    def start_teensy(self):
+        command = f"S {self.F_LED} {self.E_LED} {self.O_CAM} {self.cam_start_mode} {self.ttls_start_mode} {self.dual_mode} {self.ttl_width}\n"
+        self.ser.write(command.encode())
+        print(f"Sent start command: {command.strip()}")
+
+
+    def stop_teensy(self):
+        self.ser.write(b"Q\n")
+        print("Sent stop command: Q")
+        sleep(2)
+####

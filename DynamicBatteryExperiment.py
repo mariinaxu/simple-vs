@@ -36,7 +36,7 @@ class DynamicBatteryExperiment(BaseExperiment):
 
         # ps stands for psychopy... 
         self.ps_grating = psychopy.visual.GratingStim(win=self.window, units="deg", pos=self.grating_position, sf=self.grating_sfs[0],
-                                                       size=[self.grating_sizes[0], self.grating_sizes[0]], mask=self.grating_mask)
+                                                       size=[self.grating_sizes[0], self.grating_sizes[1]], mask=self.grating_mask)
 
         # log the experiment parameters
         #self.exp_log.log.create_dataset("exp_parameters", data=self.exp_protocol)

@@ -9,7 +9,7 @@ experiment_delay: 8
 
 
 DisplaySequence:
-  ds_log_dir: C:\\Users\\WorkStation\\VS-data
+  ds_log_dir: C:\\Data\retinotopy
   ds_backupdir: null
   ds_identifier: TEST
   ds_display_iter: 1.0
@@ -37,7 +37,7 @@ generic_stimulus_parameters:
   post_gap_dur: 3.0
   background: 0.0
   coordinate: degree
-  block_iterations: 30 #30  #orginal is 20 # same as ds_display_iter or repeat in ab lab
+  block_iterations: 1 #30  #orginal is 20 # same as ds_display_iter or repeat in ab lab
 
 KSstimAllDir:
   ks_square_size: 25.0
